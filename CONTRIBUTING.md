@@ -24,11 +24,7 @@ There is no build step and no runtime dependency. The extension is plain HTML, C
 2. Build the zip. Files marked `export-ignore` in `.gitattributes` stay out of it:
 
    ```sh
-   git archive --format=zip --prefix=tabloom/ -o website/tabloom.zip HEAD
+   git archive --format=zip --prefix=tabloom/ -o tabloom.zip HEAD
    ```
 
-3. Commit `website/tabloom.zip` and push.
-
-## Website
-
-`website/` is a single static page with its screenshots and the download. Host that folder on any static host.
+3. Attach the zip to a GitHub release.

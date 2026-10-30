@@ -6,7 +6,7 @@ Your new tab, in bloom. A colorful new tab for work. Bookmarks, Google apps and 
 
 ## Install
 
-Download [tabloom.zip](website/tabloom.zip) and unzip it, or clone this repo.
+Clone this repo, or use **Code > Download ZIP** on GitHub and unzip it.
 
 1. Open `chrome://extensions` (Edge: `edge://extensions`).
 2. Turn on **Developer mode**.
@@ -80,7 +80,6 @@ css/            tokens.css, ui.css (button and parts), app.css, popup.css
 src/            main, store, links, notes, today, bloom, dots, photo, favicon, markdown, lib, sw
 assets/         icons, font, logo
 tests/          Unit tests for parsing and URL safety
-website/        Landing page with the download
 DESIGN.md       Design system
 ```
 
