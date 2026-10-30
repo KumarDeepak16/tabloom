@@ -3,7 +3,7 @@ import { state, load, save, flush, onRemote, onSaveFailed } from './store.js';
 import { localDay, safeUrl, timeTheme, validBackup } from './lib.js';
 import { initDots, setMotion } from './dots.js';
 import { applyPhoto, applyPhotoLook, removePhoto, setPhotoLink, uploadPhoto } from './photo.js';
-import { initTooltips, toast } from './ui.js';
+import { downloadJson, initTooltips, toast } from './ui.js';
 import { backfillFavicons, openPicker, renderLinks, restoreLinks } from './links.js';
 import { closeNote, isEditing, learnedNote, newNote, renderBoard, syncNotes, tidyNotes, todayNote } from './notes.js';
 import { activeDay, closeDay, initCalendar, renderCalendar } from './calendar.js';
@@ -11,8 +11,10 @@ import { afterTasks, initRail, renderTasks, rollDay } from './today.js';
 import { initHeader, paintHeader } from './header.js';
 import { loadDocs, renderAgenda, setCalendarFeed, setDocs, syncMeetings } from './agenda.js';
 import { growBloom, initBloom, renderBloom } from './bloom.js';
+import { initFind, openFind } from './find.js';
 
 const $ = (id) => document.getElementById(id);
+const BACKUP_EVERY = 7 * 864e5;
 
 function setDigits(text) {
   const box = $('clock-digits');
@@ -170,6 +172,11 @@ function pressed(row, value) {
   for (const btn of $(row).children) btn.setAttribute('aria-pressed', btn.dataset.v === value);
 }
 
+function showSection(name) {
+  pressed('set-nav', name);
+  for (const pane of document.querySelectorAll('[data-pane]')) pane.hidden = pane.dataset.pane !== name;
+}
+
 function paintSettings() {
   const s = state.settings;
   pressed('set-theme', s.theme);
@@ -213,14 +220,11 @@ function savePortfolio(input, error) {
 
 function exportData() {
   const { notes, tasks, links, streak, bloom, work } = state;
+  state.settings.backupAt = Date.now();
+  save('settings');
   // The calendar address is a secret, so it never goes into a file.
   const settings = { ...state.settings, ical: '' };
-  const blob = new Blob([JSON.stringify({ notes, tasks, links, settings, streak, bloom, work }, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `tabula-backup-${localDay()}.json`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  downloadJson(`tabula-backup-${localDay()}.json`, { notes, tasks, links, settings, streak, bloom, work });
 }
 
 async function importData(file) {
@@ -255,6 +259,15 @@ async function importData(file) {
   paintClock();
   if ($('hello-dialog').open) $('hello-dialog').close();
   toast('Backup restored');
+}
+
+// The clock starts on the first visit, so a new install is left alone for a week.
+function remindBackup() {
+  const { backupAt } = state.settings;
+  if (Date.now() - backupAt < BACKUP_EVERY) return;
+  state.settings.backupAt = Date.now();
+  save('settings');
+  if (backupAt) toast('No backup for a week. Your notes live only in this browser.', { label: 'Export', run: exportData });
 }
 
 function renderAll() {
@@ -304,16 +317,30 @@ function bindUi() {
 
   const openSettings = () => {
     paintSettings();
+    showSection('general');
     $('settings-dialog').showModal();
   };
+  $('set-nav').addEventListener('click', (e) => {
+    const value = e.target.closest('[data-v]')?.dataset.v;
+    if (value) showSection(value);
+  });
   $('open-settings').onclick = openSettings;
+  $('open-find').onclick = openFind;
+  initFind([
+    { title: 'New note', symbol: 'i-plus', run: () => newNote(activeDay()) },
+    { title: "Today's note", symbol: 'i-note', run: todayNote },
+    { title: 'What I learned', symbol: 'i-bulb', run: learnedNote },
+    { title: 'Show or hide calendar', symbol: 'i-cal', run: toggleCalendar },
+    { title: 'Switch theme', symbol: 'i-sun', run: cycleTheme },
+    { title: 'Open settings', symbol: 'i-gear', run: openSettings },
+  ]);
   $('portfolio').onclick = (e) => {
     if ($('portfolio').href) return;
     e.preventDefault();
     openSettings();
     $('set-portfolio').focus();
   };
-  $('settings-close').onclick = () => $('settings-dialog').close();
+  $('settings-close').onclick = $('settings-x').onclick = () => $('settings-dialog').close();
   $('set-name').addEventListener('input', (e) => {
     state.settings.name = e.target.value.trim();
     save('settings');
@@ -398,11 +425,16 @@ function bindUi() {
       toggleCalendar();
     } else if (key === 't') {
       toggleToday();
+    } else if (key === 's') {
+      openSettings();
+    } else if (key === '/') {
+      e.preventDefault();
+      openFind();
     }
   });
 
   addEventListener('pagehide', flush);
-  document.addEventListener('visibilitychange', () => document.hidden && flush());
+  document.addEventListener('visibilitychange', () => (document.hidden ? flush() : loadDocs()));
 }
 
 await load();
@@ -426,6 +458,7 @@ initBloom();
 initTooltips();
 initDots();
 if (!state.settings.onboarded) showWelcome();
+else setTimeout(remindBackup, 2000);
 setTimeout(backfillFavicons, 1500);
 
 onRemote((key) => {

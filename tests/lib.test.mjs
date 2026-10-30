@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { renderMarkdown as md } from '../src/markdown.js';
 import { meetingsBetween } from '../src/ics.js';
 import { defaultLinks, upgradeLinks } from '../src/defaults.js';
-import { addClip, addSection, timeTheme, addToGroup, bloomStage, dayDiff, daysBefore, formatTime, keepTasks, localDay, monthWeeks, nextBloom, noteDay, parseTime, safeUrl, validBackup, weekBars, workProgress, yesterday } from '../src/lib.js';
+import { addClip, addSection, importLinks, moveLink, rankFind, timeTheme, webTarget, addToGroup, bloomStage, dayDiff, daysBefore, formatTime, keepTasks, localDay, monthWeeks, nextBloom, noteDay, parseDoc, parseTime, safeUrl, timeAgo, validBackup, weekBars, workProgress, yesterday } from '../src/lib.js';
 
 test('markdown: blocks', () => {
   assert.equal(md('# Hi'), '<h1>Hi</h1>');
@@ -303,4 +303,91 @@ test('validBackup', () => {
   for (const bad of [null, {}, { notes: [], tasks: [] }, { notes: [{}], tasks: [], links: [] }]) {
     assert.equal(validBackup(bad), false);
   }
+});
+
+test('parseDoc', () => {
+  const doc = (url) => parseDoc(url, 'Plan - Google Docs');
+  assert.deepEqual(doc('https://docs.google.com/document/d/abc/edit'), { id: 'abc', title: 'Plan', url: 'https://docs.google.com/document/d/abc/edit', icon: 'docs.png' });
+  assert.equal(doc('https://docs.google.com/document/u/1/d/abc/edit').id, 'abc');
+  assert.equal(doc('https://docs.google.com/a/example.com/document/d/abc/edit').id, 'abc');
+  assert.equal(doc('https://docs.google.com/forms/d/e/1FAI/viewform').id, '1FAI');
+  assert.deepEqual(
+    parseDoc('https://drive.google.com/file/d/xyz/view', 'dk.png - Google Drive'),
+    { id: 'xyz', title: 'dk.png', url: 'https://drive.google.com/file/d/xyz/view', icon: 'drive.svg' },
+  );
+  for (const skip of ['https://docs.google.com/document/u/0/', 'https://drive.google.com/drive/folders/abc', 'https://evil.com/docs.google.com/document/d/abc']) {
+    assert.equal(doc(skip), null);
+  }
+  assert.equal(parseDoc('https://docs.google.com/document/d/abc/edit', ''), null);
+});
+
+test('timeAgo', () => {
+  const now = 1e12;
+  assert.equal(timeAgo(now - 30e3, now), 'Just now');
+  assert.equal(timeAgo(now - 5 * 60e3, now), '5m ago');
+  assert.equal(timeAgo(now - 3 * 36e5, now), '3h ago');
+  assert.equal(timeAgo(now - 2 * 864e5, now), '2d ago');
+});
+
+test('importLinks', () => {
+  const links = defaultLinks();
+  let n = 0;
+  const result = importLinks(links, [
+    { url: 'example.com' },
+    { name: ' Hub ', url: 'https://github.com/', section: 'Work' },
+    { name: 'Again', url: 'https://github.com/', section: 'work' },
+    { url: 'javascript:alert(1)', section: 'Bad' },
+    { name: 'No address' },
+    null,
+  ], () => `id${++n}`);
+  assert.deepEqual(result, { added: 2, existing: 1, skipped: 3 });
+  assert.deepEqual(links.find((g) => g.id === 'bookmarks').items, [{ name: 'example.com', url: 'https://example.com/' }]);
+  const work = links.find((g) => g.title === 'Work');
+  assert.deepEqual(work.items, [{ name: 'Hub', url: 'https://github.com/' }]);
+  assert.equal(links.some((g) => g.title === 'Bad'), false);
+  for (const bad of [null, {}, 'x']) assert.equal(importLinks(links, bad, () => 'x'), null);
+});
+
+test('rankFind', () => {
+  const items = [
+    { title: 'Note', sub: 'Note', body: 'call the gym' },
+    { title: 'Big gym plan' },
+    { title: 'Algymra' },
+    { title: 'Gym' },
+    { title: 'Other' },
+  ];
+  assert.deepEqual(rankFind(items, ' GYM ', 8).map((i) => i.title), ['Gym', 'Big gym plan', 'Algymra', 'Note']);
+  assert.equal(rankFind(items, 'gym', 2).length, 2);
+});
+
+test('webTarget', () => {
+  assert.equal(webTarget('github.com/x').url, 'https://github.com/x');
+  assert.equal(webTarget('a b&c').url, 'https://www.google.com/search?q=a%20b%26c');
+  assert.match(webTarget('node.js tutorial').url, /google/);
+});
+
+test('moveLink', () => {
+  const make = () => [
+    { id: 'a', items: [{ url: 'https://1.io' }, { url: 'https://2.io' }, { url: 'https://3.io' }] },
+    { id: 'b', custom: true, items: [{ url: 'https://4.io' }] },
+  ];
+  const order = (g) => g.items.map((i) => i.url.slice(8, 9)).join('');
+  let links = make();
+  assert.ok(moveLink(links, 'a', 0, 'a', 2));
+  assert.equal(order(links[0]), '213');
+  links = make();
+  assert.ok(moveLink(links, 'a', 2, 'a', 0));
+  assert.equal(order(links[0]), '312');
+  links = make();
+  assert.ok(moveLink(links, 'a', 0, 'a', Infinity));
+  assert.equal(order(links[0]), '231');
+  links = make();
+  assert.equal(moveLink(links, 'a', 1, 'a', 1), false);
+  assert.equal(moveLink(links, 'a', 1, 'a', 2), false);
+  assert.ok(moveLink(links, 'b', 0, 'a', 1));
+  assert.equal(order(links[0]), '1423');
+  assert.equal(links.length, 1);
+  links = make();
+  links[1].items.push({ url: 'https://1.io' });
+  assert.equal(moveLink(links, 'a', 0, 'b', 0), false);
 });

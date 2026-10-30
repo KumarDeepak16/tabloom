@@ -111,6 +111,8 @@ There is one button, `.btn`. Shape, type and press behavior never change. Only i
 | Day view | `.day` | The clicked date grows into it; note cards pop in one after another |
 | Work bar | `.cal-bar` + `.{hue}-note` | Paper colors with a thin lower edge; flat ends mean it continues into the next week |
 | Work chip | `.cal-chip` | Strip below the month: name, day count, days left |
+| Quick search | `#find-dialog` + `.find-row` | Opens high on the page, the row in use gets a blue edge, matches get a yellow mark |
+| Settings sections | `.settings-nav` + `.settings-pane` | Menu of `.btn` on the left, one section open at a time. Title and Done stay fixed, the section scrolls |
 
 Radii: `--r-s` 0.6rem for small parts, `--r-m` 0.85rem for buttons and fields, `--r-l` 1.35rem for panels, and 28% on tiles.
 

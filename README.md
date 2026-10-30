@@ -78,6 +78,11 @@ Download the latest zip, replace the files in the same folder, then press the re
 | Save the site you are on | Tabloom toolbar icon, or Alt+Shift+S |
 | Save with the browser star | It lands in Bookmarks too. Turn off in Settings |
 | Add many bookmarks at once | Settings > Add browser bookmarks, then **Select all** or search and tick, then Add. Search first to take one folder. The list scrolls past eight rows |
+| Add links from a file | Settings > Links > Download format, fill in the JSON list, then **Import links file**. A new section name creates that section. A bookmarks HTML file from any browser works too and lands in Bookmarks. Links you already have stay as they are |
+| Save your links | Settings > Links > Download my links gives a file you can import again |
+| Open Settings | The Settings key, or press S |
+| Find anything | Press / or the Search key. It covers links, recent docs, notes and actions. Enter on anything else searches Google, and something like `github.com` opens directly |
+| Reorder links | Drag a link, also into another section. Or right-click it, **Move earlier** or **Move later** |
 | Bring bookmarks from another browser | Import them into this browser first at `chrome://settings/importData`, then use Add browser bookmarks |
 | New note | **New note**, or press N. An empty note is reused, never duplicated |
 | Daily notes | **Today's note** and **What I learned** open the same note all day |
@@ -98,7 +103,7 @@ Download the latest zip, replace the files in the same folder, then press the re
 | Save a link or page to any section | Right-click it, **Save link to Tabloom**. Pick a section, or **New section** to create one like Certificates. The toolbar icon offers the same. A new section disappears with its last link |
 | Switch theme | The theme key in the header cycles Light, Dark, then Day and night, which is light from 7 AM to 7 PM and dark otherwise. Settings also offers System |
 | See your meetings | Paste your Google Calendar secret iCal address in Settings. The next two appear under your to-dos with a Join button, and as dots on the day path |
-| See recent Google docs | Settings > Recent Google docs > Show, then allow history access |
+| See recent Google docs | Settings > Recent Google docs > Show, then allow history access. The last six Docs, Sheets, Slides, Forms or Drive files you opened in this browser appear under your to-dos |
 | Read the header | The sun walks the day from 6 AM to 10 PM. Dots on the path are timed tasks and meetings; hover one. Hover the icon keys for their names |
 | Use your own image | Settings > Background image: upload or paste a link, then set Blur and Dim |
 | Switch 12 or 24 hour clock | Settings > Clock |
@@ -113,7 +118,7 @@ Change the save shortcut at `chrome://extensions/shortcuts`.
 
 Everything stays in this browser's extension storage, and there is no account or sync. Two exceptions: if you add your calendar address, Tabloom reads that feed from Google every 15 minutes, and when a link's icon is not already in your browser, Tabloom asks Google's favicon service for it once, which shares that site's domain with Google. Local addresses are never sent.
 
-**Removing the extension deletes your notes**, so use Settings > Export file first. Import file restores notes, tasks, calendar, links and settings together, also on another computer. An uploaded background image is not in the file, so upload it again there.
+**Removing the extension deletes your notes**, so use Settings > Export file first. Tabloom reminds you once a week if you have not. Import file restores notes, tasks, calendar, links and settings together, also on another computer. An uploaded background image is not in the file, so upload it again there.
 
 ## Project layout
 
@@ -122,7 +127,7 @@ manifest.json   Extension config
 newtab.html     The page
 popup.html      Save-this-page popup
 css/            tokens.css, ui.css (button and parts), app.css, popup.css
-src/            main, store, links, notes, today, bloom, dots, photo, favicon, markdown, lib, sw
+src/            main, store, links, find, notes, today, bloom, dots, photo, favicon, markdown, lib, sw
 assets/         icons, font, logo
 tests/          Unit tests for parsing and URL safety
 DESIGN.md       Design system

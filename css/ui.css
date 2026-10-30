@@ -436,9 +436,77 @@ dialog::backdrop {
   border: 0.08em solid rgb(0 0 0 / 0.18);
 }
 
-/* Wider dialog: settings in two columns, so nothing needs scrolling on a 14 inch screen. */
+/* One section at a time beside its menu. Title and Done stay put, and the height never jumps between sections. */
 #settings-dialog {
-  width: min(42rem, calc(100vw - 2rem));
+  width: min(48rem, calc(100vw - 2rem));
+  height: min(32rem, calc(100vh - 2.5rem));
+}
+
+#settings-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#settings-dialog .dialog-form {
+  flex: 1;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.settings-body {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: 1.1rem;
+  min-height: 0;
+}
+
+.settings-nav {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  padding-right: 1.1rem;
+  border-right: 0.09rem solid var(--line);
+}
+
+.settings-nav .btn {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+/* Negative margin plus padding keeps field rings and button edges from being clipped by the scroll. */
+.settings-pane {
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  min-height: 0;
+  overflow-y: auto;
+  margin: -0.3rem;
+  padding: 0.3rem 0.5rem 0.5rem 0.3rem;
+}
+
+.settings-pane h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+@media (max-width: 40rem) {
+  .settings-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .settings-nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    border: 0;
+  }
+
+  .settings-nav .btn {
+    width: auto;
+  }
 }
 
 .settings-grid {
@@ -471,6 +539,69 @@ dialog::backdrop {
 }
 
 /* Browser bookmark picker */
+/* Quick search sits high, so the box stays still while results change. */
+#find-dialog {
+  width: min(36rem, calc(100vw - 2rem));
+  margin-top: 12vh;
+  padding: 0.85rem;
+}
+
+#find-dialog[open] {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.find-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.1rem;
+}
+
+.find-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.3rem;
+  padding: 0 0.55rem;
+  border-radius: var(--r-s);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.find-row.is-on {
+  background: var(--sunken);
+  box-shadow: inset 0.16rem 0 0 var(--blue);
+}
+
+.find-row img,
+.find-row svg {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.find-row span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.find-row small {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.find-row mark {
+  border-radius: 0.2rem;
+  background: var(--yellow);
+  color: var(--on-color);
+}
+
 .pick-list {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

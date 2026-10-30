@@ -210,7 +210,22 @@ body {
 }
 
 :root[data-side='min'] .tiles,
-:root[data-side='min'] .marks {
+:root[data-side='min'] li.is-dragging {
+  opacity: 0.35;
+}
+
+li.drop-here > a {
+  outline: 0.14rem solid var(--blue);
+  outline-offset: 0.1rem;
+}
+
+.group.drop-here {
+  outline: 0.12rem dashed var(--blue);
+  outline-offset: 0.15rem;
+  border-radius: var(--r-s);
+}
+
+.marks {
   grid-template-columns: minmax(0, 1fr);
   max-height: none;
 }
@@ -1676,6 +1691,16 @@ body {
 
 .agenda-row.live b {
   color: var(--green-edge);
+}
+
+a.agenda-row b {
+  color: var(--muted);
+}
+
+.agenda-row.agenda-more {
+  min-height: 1.4rem;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .agenda-row img {

@@ -116,6 +116,7 @@ export const defaultSettings = () => ({
   calendar: true,
   ical: '',
   docs: false,
+  backupAt: 0,
   motion: 'dots',
   photo: '',
   blur: 8,

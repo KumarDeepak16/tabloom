@@ -1,8 +1,8 @@
 import { state, save, flush } from './store.js';
 import { allBookmarks, defaultLinks } from './defaults.js';
 import { faviconUrl, remoteFavicon, saveFavicon } from './favicon.js';
-import { addToGroup, safeUrl } from './lib.js';
-import { openMenu, toast } from './ui.js';
+import { addToGroup, importLinks, localDay, moveLink, safeUrl } from './lib.js';
+import { downloadJson, openMenu, toast } from './ui.js';
 
 const HUES = ['pink', 'blue', 'green', 'orange', 'purple', 'yellow'];
 const groupsEl = document.getElementById('groups');
@@ -45,6 +45,7 @@ function linkEl(group, item, index) {
   const url = safeUrl(item.url);
   const a = document.createElement('a');
   if (url) a.href = url;
+  a.draggable = true;
   a.oncontextmenu = (e) => {
     e.preventDefault();
     showMenu(e.clientX, e.clientY, group, item);
@@ -70,9 +71,17 @@ function linkEl(group, item, index) {
 function showMenu(x, y, group, item) {
   const items = [];
   if (safeUrl(item.new)) items.push({ label: item.newLabel, run: () => (location.href = safeUrl(item.new)) });
+  const at = group.items.indexOf(item);
+  if (at > 0) items.push({ label: 'Move earlier', run: () => move(group.id, at, group.id, at - 1) });
+  if (at < group.items.length - 1) items.push({ label: 'Move later', run: () => move(group.id, at, group.id, at + 2) });
   items.push({ label: 'Edit', run: () => openDialog(group, item) });
   items.push({ label: 'Remove', run: () => removeItem(group, item) });
   openMenu(x, y, items);
+}
+
+function move(fromId, from, toId, at) {
+  if (moveLink(state.links, fromId, from, toId, at)) commit();
+  else if (fromId !== toId) toast('That link is already in this section');
 }
 
 function removeItem(group, item) {
@@ -105,6 +114,7 @@ export function renderLinks() {
     ...state.links.map((group) => {
       const section = document.createElement('section');
       section.className = `group${group.id === 'ai' ? ' push' : ''}`;
+      section.dataset.group = group.id;
       section.style.setProperty('--hue', `var(--${group.hue}-edge)`);
 
       const head = document.createElement('div');
@@ -117,6 +127,7 @@ export function renderLinks() {
       list.className = group.style === 'text' ? 'marks' : 'tiles';
       group.items.forEach((item, i) => {
         const li = document.createElement('li');
+        li.dataset.at = i;
         li.append(linkEl(group, item, i));
         list.append(li);
       });
@@ -134,6 +145,47 @@ export function renderLinks() {
     }),
   );
 }
+
+// Drag a link to reorder it or carry it to another section.
+let dragged = null;
+
+function clearDrop() {
+  groupsEl.querySelectorAll('.drop-here, .is-dragging').forEach((el) => el.classList.remove('drop-here', 'is-dragging'));
+}
+
+groupsEl.addEventListener('dragstart', (e) => {
+  const li = e.target.closest('li[data-at]');
+  if (!li) return;
+  dragged = { group: li.closest('.group').dataset.group, at: Number(li.dataset.at) };
+  e.dataTransfer.effectAllowed = 'move';
+  // Next frame, so the drag picture keeps full color.
+  requestAnimationFrame(() => li.classList.add('is-dragging'));
+});
+
+groupsEl.addEventListener('dragover', (e) => {
+  const section = e.target.closest('.group');
+  if (!dragged || !section) return;
+  e.preventDefault();
+  const spot = e.target.closest('li[data-at]') ?? section;
+  if (spot.classList.contains('drop-here')) return;
+  groupsEl.querySelectorAll('.drop-here').forEach((el) => el.classList.remove('drop-here'));
+  spot.classList.add('drop-here');
+});
+
+groupsEl.addEventListener('drop', (e) => {
+  const section = e.target.closest('.group');
+  if (!dragged || !section) return;
+  e.preventDefault();
+  const li = e.target.closest('li[data-at]');
+  move(dragged.group, dragged.at, section.dataset.group, li ? Number(li.dataset.at) : Infinity);
+  dragged = null;
+  clearDrop();
+});
+
+groupsEl.addEventListener('dragend', () => {
+  dragged = null;
+  clearDrop();
+});
 
 function openDialog(group, item) {
   editing = { group, item };
@@ -206,6 +258,52 @@ export function restoreLinks() {
   commit();
   toast('Default links restored');
 }
+
+const LINKS_FORMAT = [
+  { name: 'Tabloom', url: 'https://tabloom.1619.in/', section: 'Bookmarks' },
+  { name: 'GitHub', url: 'https://github.com/', section: 'Work' },
+  { name: 'MDN', url: 'https://developer.mozilla.org/', section: 'Work' },
+  { url: 'https://www.wikipedia.org/' },
+];
+
+const linksFile = document.getElementById('links-file');
+document.getElementById('links-format').onclick = () => downloadJson('tabloom-links-format.json', LINKS_FORMAT);
+document.getElementById('links-import').onclick = () => linksFile.click();
+document.getElementById('links-export').onclick = () => {
+  const rows = state.links.flatMap((g) => g.items.map((i) => ({ name: i.name, url: i.url, section: g.title })));
+  downloadJson(`tabloom-links-${localDay()}.json`, rows);
+};
+
+async function readRows(file) {
+  const text = await file.text();
+  if (/\.html?$/i.test(file.name)) {
+    // A browser's bookmarks export. All of it lands in Bookmarks: a section per folder would flood the sidebar.
+    const anchors = new DOMParser().parseFromString(text, 'text/html').querySelectorAll('a[href]');
+    return [...anchors].map((a) => ({ name: a.textContent, url: a.getAttribute('href') }));
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+linksFile.onchange = async () => {
+  const [file] = linksFile.files;
+  linksFile.value = '';
+  if (!file) return;
+  const before = structuredClone(state.links);
+  const result = importLinks(state.links, await readRows(file), () => crypto.randomUUID());
+  if (!result) return toast('That file is not a list of links. Use Download format to see the layout.');
+  const { added, existing, skipped } = result;
+  const parts = [`${added} ${added === 1 ? 'link' : 'links'} added`];
+  if (existing) parts.push(`${existing} already here`);
+  if (skipped) parts.push(`${skipped} without a valid address`);
+  commit();
+  const undo = { label: 'Undo', run: () => { state.links = before; commit(); } };
+  toast(parts.join(', '), added ? undo : undefined);
+  backfillFavicons();
+};
 
 // Browser bookmark picker
 const pickDialog = document.getElementById('pick-dialog');

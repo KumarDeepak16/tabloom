@@ -204,3 +204,90 @@ export function validBackup(data) {
         data.work.every((w) => typeof w?.id === 'string' && typeof w?.title === 'string' && DAY.test(w?.start) && DAY.test(w?.end))))
   );
 }
+
+// Covers second accounts (/u/1/), work domains (/a/name.com/) and public forms (/d/e/).
+const DOC_URL = /^https:\/\/(?:docs|drive)\.google\.com\/(?:a\/[^/]+\/)?(document|spreadsheets|presentation|forms|file)(?:\/u\/\d+)?\/d\/(?:e\/)?([\w-]+)/;
+const DOC_KINDS = {
+  document: ['docs.png', / - Google Docs$/],
+  spreadsheets: ['sheets.png', / - Google Sheets$/],
+  presentation: ['slides.png', / - Google Slides$/],
+  forms: ['forms.png', / - Google Forms$/],
+  file: ['drive.svg', / - Google Drive$/],
+};
+
+export function parseDoc(url = '', title = '') {
+  const match = DOC_URL.exec(url);
+  if (!match || !title) return null;
+  const [icon, suffix] = DOC_KINDS[match[1]];
+  return { id: match[2], title: title.replace(suffix, ''), url, icon };
+}
+
+export function timeAgo(then, now = Date.now()) {
+  const minutes = Math.floor((now - then) / 60000);
+  if (minutes < 60) return minutes < 1 ? 'Just now' : `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  return hours < 24 ? `${hours}h ago` : `${Math.floor(hours / 24)}d ago`;
+}
+
+// Bulk link file, a list of { url, name?, section? }. Links already in their section stay as they are.
+// Returns null when it is not a list.
+export function importLinks(links, rows, makeId) {
+  if (!Array.isArray(rows)) return null;
+  const result = { added: 0, existing: 0, skipped: 0 };
+  for (const row of rows) {
+    const url = safeUrl(typeof row?.url === 'string' ? row.url : '');
+    if (!url) {
+      result.skipped += 1;
+      continue;
+    }
+    const name = (typeof row.name === 'string' && row.name.trim().slice(0, 60)) || new URL(url).hostname;
+    const section = typeof row.section === 'string' ? row.section.trim().slice(0, 30) : '';
+    const group = section ? addSection(links, section, makeId()) : links.find((g) => g.id === 'bookmarks');
+    if (group.items.some((i) => safeUrl(i.url) === url)) {
+      result.existing += 1;
+      continue;
+    }
+    addToGroup(links, group.id, { name, url });
+    result.added += 1;
+  }
+  return result;
+}
+
+// Quick search order: title start, word start, anywhere in the title, then section or note text.
+export function rankFind(items, query, limit) {
+  const q = query.trim().toLowerCase();
+  const score = ({ title, sub = '', body = '' }) => {
+    const t = title.toLowerCase();
+    if (t.startsWith(q)) return 0;
+    if (t.split(/\s+/).some((word) => word.startsWith(q))) return 1;
+    if (t.includes(q)) return 2;
+    return `${sub} ${body}`.toLowerCase().includes(q) ? 3 : 4;
+  };
+  return items
+    .map((item) => [score(item), item])
+    .filter(([s]) => s < 4)
+    .sort((a, b) => a[0] - b[0])
+    .slice(0, limit)
+    .map(([, item]) => item);
+}
+
+// What Enter does when nothing else fits: open something shaped like an address, or search Google.
+export function webTarget(text) {
+  if (/^[^\s/]+\.[a-z]{2,}(\/\S*)?$/i.test(text)) return { title: `Open ${text}`, url: safeUrl(text) };
+  return { title: `Search Google for "${text}"`, url: `https://www.google.com/search?q=${encodeURIComponent(text)}` };
+}
+
+// Moves a link to just before position `at` in the target section. A section the user made goes with its last link.
+export function moveLink(links, fromId, from, toId, at) {
+  const source = links.find((g) => g.id === fromId);
+  const target = links.find((g) => g.id === toId);
+  const item = source?.items[from];
+  if (!item || !target) return false;
+  const same = source === target;
+  const to = same && at > from ? at - 1 : at;
+  if (same ? to === from : target.items.some((i) => safeUrl(i.url) === safeUrl(item.url))) return false;
+  source.items.splice(from, 1);
+  target.items.splice(to, 0, item);
+  if (source.custom && !source.items.length) links.splice(links.indexOf(source), 1);
+  return true;
+}

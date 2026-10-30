@@ -1,22 +1,15 @@
 // "Coming up" section under the to-do list: meetings and recent docs, shown only when there are some.
 
 import { state, save, flush } from './store.js';
-import { formatTime, safeUrl } from './lib.js';
+import { formatTime, parseDoc, safeUrl, timeAgo } from './lib.js';
 import { meetingsBetween, startOfDay, twoDaysFrom } from './ics.js';
 import { toast } from './ui.js';
 
 const REFRESH = 15 * 60 * 1000;
 const MEETINGS_SHOWN = 2;
-const DOCS_SHOWN = 3;
+const DOCS_SHOWN = 6;
 const LOOK_BACK = 14 * 864e5;
 const ICAL = /^https:\/\/calendar\.google\.com\/calendar\/ical\/\S+\.ics$/;
-const DOC_PATTERN = /docs\.google\.com\/(document|spreadsheets|presentation|forms)\/d\/([\w-]+)/;
-const KINDS = {
-  document: ['docs.png', / - Google Docs$/],
-  spreadsheets: ['sheets.png', / - Google Sheets$/],
-  presentation: ['slides.png', / - Google Slides$/],
-  forms: ['forms.png', / - Google Forms$/],
-};
 
 const $ = (id) => document.getElementById(id);
 const dayFmt = new Intl.DateTimeFormat('en-GB', { weekday: 'short' });
@@ -59,15 +52,27 @@ function docRow(doc) {
   icon.src = `assets/icons/${doc.icon}`;
   icon.alt = '';
   el.prepend(icon);
+  const when = document.createElement('b');
+  when.textContent = timeAgo(doc.at);
+  el.append(when);
   return el;
 }
+
+function driveRow() {
+  const el = row('a', 'All recent files in Drive');
+  el.href = 'https://drive.google.com/drive/recent';
+  el.classList.add('agenda-more');
+  return el;
+}
+
+export const recentDocs = () => (state.settings.docs ? docs : []);
 
 export function renderAgenda() {
   const now = Date.now();
   const meetings = state.settings.ical ? state.meetings.list.filter((m) => m.end > now).slice(0, MEETINGS_SHOWN) : [];
-  const shown = state.settings.docs ? docs : [];
+  const shown = recentDocs();
   $('agenda-meetings').replaceChildren(...meetings.map(meetingRow));
-  $('agenda-docs').replaceChildren(...shown.map(docRow));
+  $('agenda-docs').replaceChildren(...shown.map(docRow), driveRow());
   $('agenda-meetings').hidden = !meetings.length;
   $('agenda-docs').hidden = !shown.length;
   $('agenda').hidden = !meetings.length && !shown.length;
@@ -91,16 +96,16 @@ export async function syncMeetings(force = false) {
 
 export async function loadDocs() {
   if (!state.settings.docs || !chrome.history) return;
-  const items = await chrome.history.search({ text: 'docs.google.com', startTime: Date.now() - LOOK_BACK, maxResults: 60 });
+  const searches = ['docs.google.com', 'drive.google.com'].map((text) => chrome.history.search({ text, startTime: Date.now() - LOOK_BACK, maxResults: 60 }));
+  const items = (await Promise.all(searches)).flat();
   const seen = new Set();
   docs = items
     .sort((a, b) => b.lastVisitTime - a.lastVisitTime)
     .flatMap((item) => {
-      const match = DOC_PATTERN.exec(item.url ?? '');
-      if (!match || !item.title || seen.has(match[2])) return [];
-      seen.add(match[2]);
-      const [icon, suffix] = KINDS[match[1]];
-      return [{ title: item.title.replace(suffix, ''), url: item.url, icon }];
+      const doc = parseDoc(item.url, item.title);
+      if (!doc || seen.has(doc.id)) return [];
+      seen.add(doc.id);
+      return [{ ...doc, at: item.lastVisitTime }];
     })
     .slice(0, DOCS_SHOWN);
   renderAgenda();

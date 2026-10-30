@@ -30,6 +30,7 @@
         <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.500c0-2-3-3.200-3-7.300a6 6 0 0 1 12 0c0 4.100-3 5.300-3 7.300ZM10 21h4" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round" /></symbol>
         <symbol id="i-tidy" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="13" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="4" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="13" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /></symbol>
         <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5.500" width="16" height="14.500" rx="3.200" fill="none" stroke="currentColor" stroke-width="2.600" /><path d="M4 10.500h16M8.500 3.500v3.500M15.500 3.500v3.500" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" /></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500" fill="none" stroke="currentColor" stroke-width="2.800" /><path d="m16 16 4.500 4.500" stroke="currentColor" stroke-width="2.800" stroke-linecap="round" /></symbol>
         <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.6 2.2c.6 3.6-1 5-2.6 6.8-.3-1-.8-1.700-1.600-2.300C6.400 8.800 5 11.100 5 13.800 5 18.100 8 21.500 12 21.500s7-3.200 7-7.500c0-4.900-3.300-8.800-6.400-11.800Z" fill="var(--orange)" /><path d="M12.100 12.200c.3 1.800-2.600 2.800-2.600 5.200 0 1.900 1.100 3 2.600 3s2.700-1.200 2.700-3c0-2.100-1.500-3.600-2.700-5.200Z" fill="var(--yellow)" /></symbol>
       </defs>
     </svg>
@@ -72,6 +73,7 @@
         </svg>
         <div class="dock">
           <button class="btn green is-open" id="new-note"><svg><use href="#i-plus" /></svg><span class="fold"><b>New note</b></span></button>
+          <button class="btn blue" id="open-find" aria-label="Search"><svg><use href="#i-search" /></svg><span class="fold"><b>Search</b></span></button>
           <button class="btn yellow" id="today-note" aria-label="Today's note"><svg><use href="#i-note" /></svg><span class="fold"><b>Today's note</b></span></button>
           <button class="btn purple" id="learned-note" aria-label="What I learned"><svg><use href="#i-bulb" /></svg><span class="fold"><b>What I learned</b></span></button>
           <button class="btn" id="tidy" aria-label="Tidy"><svg><use href="#i-tidy" /></svg><span class="fold"><b>Tidy</b></span></button>
@@ -243,89 +245,142 @@
       </div>
     </dialog>
 
-    <dialog id="settings-dialog">
+    <dialog id="find-dialog" closedby="any" aria-label="Quick search">
+      <input class="field" id="find-input" role="combobox" aria-expanded="true" aria-controls="find-list" placeholder="Search links, notes and docs, or the web" aria-label="Search" autocomplete="off" spellcheck="false" />
+      <div class="find-list" id="find-list" role="listbox" aria-label="Results"></div>
+      <p class="hint">Enter opens. Ctrl+Enter opens a new tab. Esc closes.</p>
+    </dialog>
+
+    <dialog id="settings-dialog" closedby="any">
       <div class="dialog-form">
-        <h2 class="dialog-title">Settings</h2>
-        <div class="settings-grid">
-        <label class="label">Your name<input class="field" id="set-name" maxlength="30" autocomplete="off" /></label>
-        <label class="label">Portfolio link<input class="field" id="set-portfolio" placeholder="yourname.com" autocomplete="off" /></label>
-        <div class="setting">Theme
-          <div class="row" id="set-theme">
-            <button class="btn is-small" data-v="auto">System</button>
-            <button class="btn is-small" data-v="light">Light</button>
-            <button class="btn is-small" data-v="dark">Dark</button>
-            <button class="btn is-small" data-v="time">Day and night</button>
-          </div>
-        </div>
-        <div class="setting">Clock
-          <div class="row" id="set-clock">
-            <button class="btn is-small" data-v="12">12 hour</button>
-            <button class="btn is-small" data-v="24">24 hour</button>
-          </div>
-        </div>
-        <div class="setting">Bookmarks saved with the browser star
-          <div class="row" id="set-mirror">
-            <button class="btn is-small" data-v="on">Add to Tabloom</button>
-            <button class="btn is-small" data-v="off">Ignore</button>
-          </div>
-        </div>
-        <div class="setting">Home layout
-          <div class="row" id="set-calendar">
-            <button class="btn is-small" data-v="on">With calendar</button>
-            <button class="btn is-small" data-v="off">Without calendar</button>
-          </div>
-        </div>
-        <label class="setting wide">Google Calendar meetings
-          <input class="field" id="set-ical" placeholder="Paste your secret address in iCal format" autocomplete="off" spellcheck="false" />
-          <span class="hint">Google Calendar > Settings > your calendar > Integrate calendar. Keep this address private, it opens your calendar.</span>
-          <span class="error" id="set-ical-error" hidden>Paste the address that starts with https://calendar.google.com and ends in .ics.</span>
-        </label>
-        <div class="setting">Recent Google docs
-          <div class="row" id="set-docs">
-            <button class="btn is-small" data-v="on">Show</button>
-            <button class="btn is-small" data-v="off">Hide</button>
-          </div>
-        </div>
-        <div class="setting">Links
-          <div class="row">
-            <button class="btn is-small" id="import-picker">Add browser bookmarks</button>
-            <button class="btn is-small" id="restore-links">Restore default links</button>
-          </div>
-        </div>
-        <div class="setting wide">Background animation
-          <div class="row" id="set-motion">
-            <button class="btn is-small" data-v="dots">Dots</button>
-            <button class="btn is-small" data-v="grid">Grid lines</button>
-            <button class="btn is-small" data-v="aurora">Aurora</button>
-            <button class="btn is-small" data-v="fireflies">Fireflies</button>
-            <button class="btn is-small" data-v="constellation">Stars</button>
-            <button class="btn is-small" data-v="bubbles">Bubbles</button>
-            <button class="btn is-small" data-v="snake">Snake</button>
-            <button class="btn is-small" data-v="still">Still</button>
-          </div>
-        </div>
-        <div class="setting wide">Background image
-          <div class="row">
-            <button class="btn is-small" id="photo-upload">Upload image</button>
-            <button class="btn is-small" id="photo-remove">Remove image</button>
-            <input class="field" id="photo-link" style="flex: 1; width: auto; min-width: 12rem" placeholder="Or paste an image link" aria-label="Image link" autocomplete="off" />
-          </div>
-        </div>
-        <label class="slider">Blur<input type="range" id="photo-blur" min="0" max="30" /></label>
-        <label class="slider">Dim<input type="range" id="photo-dim" min="0" max="85" /></label>
-        </div>
-        <p class="error" id="set-portfolio-error" hidden>Enter a full web address, like yourname.com.</p>
-        <div class="setting">Backup of everything
-          <div class="row">
-            <button class="btn is-small" id="export-data">Export file</button>
-            <button class="btn is-small" id="import-data">Import file</button>
-          </div>
-          <p class="hint">Everything stays in this browser. Export before removing the extension or moving computer. Uploaded images are not in the file.</p>
+        <header class="row">
+          <h2 class="dialog-title" style="margin-right: auto">Settings</h2>
+          <button class="btn is-small is-square" id="settings-x" aria-label="Close settings"><svg><use href="#i-close" /></svg></button>
+        </header>
+        <div class="settings-body">
+          <nav class="settings-nav" id="set-nav" aria-label="Settings sections">
+            <button class="btn" data-v="general"><svg><use href="#i-gear" /></svg>General</button>
+            <button class="btn" data-v="look"><svg><use href="#i-sun" /></svg>Appearance</button>
+            <button class="btn" data-v="home"><svg><use href="#i-cal" /></svg>Home</button>
+            <button class="btn" data-v="links"><svg><use href="#i-tidy" /></svg>Links</button>
+            <button class="btn" data-v="backup"><svg><use href="#i-up" /></svg>Backup</button>
+          </nav>
+
+          <section class="settings-pane" data-pane="general">
+            <h3>General</h3>
+            <div class="settings-grid">
+              <label class="label">Your name<input class="field" id="set-name" maxlength="30" autocomplete="off" autofocus /></label>
+              <label class="label">Portfolio link<input class="field" id="set-portfolio" placeholder="yourname.com" autocomplete="off" /></label>
+              <div class="setting wide">Clock
+                <div class="row" id="set-clock">
+                  <button class="btn is-small" data-v="12">12 hour</button>
+                  <button class="btn is-small" data-v="24">24 hour</button>
+                </div>
+              </div>
+            </div>
+            <p class="error" id="set-portfolio-error" hidden>Enter a full web address, like yourname.com.</p>
+          </section>
+
+          <section class="settings-pane" data-pane="look">
+            <h3>Appearance</h3>
+            <div class="settings-grid">
+              <div class="setting wide">Theme
+                <div class="row" id="set-theme">
+                  <button class="btn is-small" data-v="auto">System</button>
+                  <button class="btn is-small" data-v="light">Light</button>
+                  <button class="btn is-small" data-v="dark">Dark</button>
+                  <button class="btn is-small" data-v="time">Day and night</button>
+                </div>
+              </div>
+              <div class="setting wide">Background animation
+                <div class="row" id="set-motion">
+                  <button class="btn is-small" data-v="dots">Dots</button>
+                  <button class="btn is-small" data-v="grid">Grid lines</button>
+                  <button class="btn is-small" data-v="aurora">Aurora</button>
+                  <button class="btn is-small" data-v="fireflies">Fireflies</button>
+                  <button class="btn is-small" data-v="constellation">Stars</button>
+                  <button class="btn is-small" data-v="bubbles">Bubbles</button>
+                  <button class="btn is-small" data-v="snake">Snake</button>
+                  <button class="btn is-small" data-v="still">Still</button>
+                </div>
+              </div>
+              <div class="setting wide">Background image
+                <div class="row">
+                  <button class="btn is-small" id="photo-upload">Upload image</button>
+                  <button class="btn is-small" id="photo-remove">Remove image</button>
+                  <input class="field" id="photo-link" style="flex: 1; width: auto; min-width: 12rem" placeholder="Or paste an image link" aria-label="Image link" autocomplete="off" />
+                </div>
+              </div>
+              <label class="slider">Blur<input type="range" id="photo-blur" min="0" max="30" /></label>
+              <label class="slider">Dim<input type="range" id="photo-dim" min="0" max="85" /></label>
+            </div>
+          </section>
+
+          <section class="settings-pane" data-pane="home">
+            <h3>Home</h3>
+            <div class="settings-grid">
+              <div class="setting">Home layout
+                <div class="row" id="set-calendar">
+                  <button class="btn is-small" data-v="on">With calendar</button>
+                  <button class="btn is-small" data-v="off">Without calendar</button>
+                </div>
+              </div>
+              <div class="setting">Recent Google docs
+                <div class="row" id="set-docs">
+                  <button class="btn is-small" data-v="on">Show</button>
+                  <button class="btn is-small" data-v="off">Hide</button>
+                </div>
+              </div>
+              <label class="setting wide">Google Calendar meetings
+                <input class="field" id="set-ical" placeholder="Paste your secret address in iCal format" autocomplete="off" spellcheck="false" />
+                <span class="hint">Google Calendar > Settings > your calendar > Integrate calendar. Keep this address private, it opens your calendar.</span>
+                <span class="error" id="set-ical-error" hidden>Paste the address that starts with https://calendar.google.com and ends in .ics.</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-pane" data-pane="links">
+            <h3>Links</h3>
+            <div class="settings-grid">
+              <div class="setting wide">Bookmarks saved with the browser star
+                <div class="row" id="set-mirror">
+                  <button class="btn is-small" data-v="on">Add to Tabloom</button>
+                  <button class="btn is-small" data-v="off">Ignore</button>
+                </div>
+              </div>
+              <div class="setting wide">Add many links from a file
+                <div class="row">
+                  <button class="btn is-small green" id="links-import">Import links file</button>
+                  <button class="btn is-small" id="links-format">Download format</button>
+                  <button class="btn is-small" id="links-export">Download my links</button>
+                </div>
+                <p class="hint">A JSON list, or a bookmarks HTML file exported from any browser. In JSON each link needs a url, and can have a name and a section. Without a section it goes to Bookmarks. A new section name creates that section.</p>
+              </div>
+              <div class="setting wide">From this browser
+                <div class="row">
+                  <button class="btn is-small" id="import-picker">Add browser bookmarks</button>
+                  <button class="btn is-small" id="restore-links">Restore default links</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-pane" data-pane="backup">
+            <h3>Backup</h3>
+            <div class="setting">Backup of everything
+              <div class="row">
+                <button class="btn is-small" id="export-data">Export file</button>
+                <button class="btn is-small" id="import-data">Import file</button>
+              </div>
+              <p class="hint">Everything stays in this browser. Export before removing the extension or moving computer. Uploaded images are not in the file.</p>
+            </div>
+          </section>
         </div>
         <div class="row end"><button class="btn green" id="settings-close">Done</button></div>
       </div>
     </dialog>
     <input type="file" id="import-file" accept="application/json,.json" hidden />
+    <input type="file" id="links-file" accept="application/json,.json,text/html,.html,.htm" hidden />
     <input type="file" id="photo-file" accept="image/*" hidden />
   </body>
 </html>
