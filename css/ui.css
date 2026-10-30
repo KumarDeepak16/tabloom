@@ -478,8 +478,6 @@ dialog::backdrop {
   gap: 0.1rem;
   height: 19rem;
   overflow: hidden auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
 }
 
 .pick {

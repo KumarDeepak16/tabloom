@@ -1,14 +1,22 @@
+import './compat.js';
 import { barBookmarks, defaultLinks, upgradeLinks, welcomeNote } from './defaults.js';
 import { saveFavicon } from './favicon.js';
 import { addClip, addToGroup, localDay } from './lib.js';
 
 const LINKS_VERSION = 3;
-const CLIP_MENU = [['note', 'Notes'], ['learned', 'What I learned'], ['todo', 'To-do']];
+const CLIP_MENU = [
+  ['note', 'Notes'],
+  ['note-link', 'Notes, with page link'],
+  ['learned', 'What I learned'],
+  ['learned-link', 'What I learned, with page link'],
+  ['todo', 'To-do'],
+];
 
 chrome.runtime.onInstalled.addListener(async () => {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({ id: 'tabloom', title: 'Add to Tabloom', contexts: ['selection'] });
     for (const [id, title] of CLIP_MENU) chrome.contextMenus.create({ id, parentId: 'tabloom', title, contexts: ['selection'] });
+    chrome.contextMenus.create({ id: 'save-link', title: 'Save link to Tabloom', contexts: ['link', 'page'] });
   });
 
   const { links, notes, linksVersion = 1 } = await chrome.storage.local.get(['links', 'notes', 'linksVersion']);
@@ -43,13 +51,14 @@ async function mirror(node) {
 // One at a time: each save reads then writes the whole list, so overlapping saves would drop bookmarks.
 let queue = Promise.resolve();
 
-async function clip(kind, info, tab) {
+async function clip(choice, info, tab) {
+  const [kind, link] = choice.split('-');
   const { notes = [], tasks = [] } = await chrome.storage.local.get(['notes', 'tasks']);
   const now = new Date();
   const heading = `What I learned, ${new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' }).format(now)}`;
   const added = addClip({ notes, tasks }, kind, {
     text: info.selectionText ?? '',
-    url: info.pageUrl,
+    url: link ? info.pageUrl : undefined,
     title: tab?.title,
     day: localDay(now),
     heading,
@@ -65,7 +74,16 @@ async function clip(kind, info, tab) {
   setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: tab.id }).catch(() => {}), 2200);
 }
 
+// The save window lets the user pick a section or name a new one, which a menu can't ask for.
+function openSaveWindow(info, tab) {
+  const url = info.linkUrl ?? info.pageUrl;
+  const title = info.linkUrl ? info.selectionText ?? info.linkText ?? '' : tab?.title ?? '';
+  const query = new URLSearchParams({ url, title });
+  chrome.windows.create({ url: chrome.runtime.getURL(`popup.html?${query}`), type: 'popup', width: 420, height: 400 });
+}
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'save-link') return openSaveWindow(info, tab);
   if (!CLIP_MENU.some(([id]) => id === info.menuItemId)) return;
   queue = queue.then(() => clip(info.menuItemId, info, tab)).catch(() => {});
 });

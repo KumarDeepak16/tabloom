@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { renderMarkdown as md } from '../src/markdown.js';
 import { meetingsBetween } from '../src/ics.js';
 import { defaultLinks, upgradeLinks } from '../src/defaults.js';
-import { addClip, addToGroup, bloomStage, dayDiff, daysBefore, formatTime, keepTasks, localDay, monthWeeks, nextBloom, noteDay, parseTime, safeUrl, validBackup, weekBars, workProgress, yesterday } from '../src/lib.js';
+import { addClip, addSection, timeTheme, addToGroup, bloomStage, dayDiff, daysBefore, formatTime, keepTasks, localDay, monthWeeks, nextBloom, noteDay, parseTime, safeUrl, validBackup, weekBars, workProgress, yesterday } from '../src/lib.js';
 
 test('markdown: blocks', () => {
   assert.equal(md('# Hi'), '<h1>Hi</h1>');
@@ -272,6 +272,30 @@ test('ics: recurrence', () => {
 
 test('ics: garbage input gives no meetings', () => {
   for (const text of ['', 'nonsense', 'BEGIN:VEVENT', 'BEGIN:VEVENT\nDTSTART:bad\nEND:VEVENT']) assert.deepEqual(meetingsBetween(text, 0, 1e13), []);
+});
+
+test('timeTheme: light 7 AM to before 7 PM', () => {
+  const at = (h, m = 0) => timeTheme(new Date(2026, 9, 30, h, m));
+  assert.deepEqual([at(6, 59), at(7), at(18, 59), at(19), at(0)], ['dark', 'light', 'light', 'dark', 'dark']);
+});
+
+test('addClip without a link stores only the text', () => {
+  const data = { notes: [], tasks: [] };
+  const base = { title: 'Page', day: '2026-10-30', heading: 'What I learned, 30 Oct', now: 5 };
+  addClip(data, 'note', { ...base, id: '1', text: 'Plain' });
+  assert.equal(data.notes[0].body, 'Plain');
+  addClip(data, 'learned', { ...base, id: '2', text: 'Fact' });
+  assert.match(data.notes[1].body, /- Fact\n$/);
+});
+
+test('addSection: goes after text sections, same name reuses it', () => {
+  const links = [{ id: 'bookmarks', title: 'Bookmarks', style: 'text', items: [] }, { id: 'workspace', title: 'Google Workspace', items: [] }];
+  const first = addSection(links, ' Certificates ', 'a');
+  assert.deepEqual(links.map((g) => g.id), ['bookmarks', 'a', 'workspace']);
+  assert.equal(first.title, 'Certificates');
+  assert.equal(addSection(links, 'certificates', 'b'), first);
+  addSection(links, 'Documents', 'c');
+  assert.deepEqual(links.map((g) => g.id), ['bookmarks', 'a', 'c', 'workspace']);
 });
 
 test('validBackup', () => {

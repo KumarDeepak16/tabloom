@@ -99,9 +99,12 @@ There is one button, `.btn`. Shape, type and press behavior never change. Only i
 | Plant | `.bloom` | Pot stays put, plant sways, eyes follow the cursor |
 | Sidebar rail | `:root[data-side='min']` | 4.1rem wide, icons only |
 | Today rail | `:root[data-today='min']` | 4.1rem wide: progress, streak, Bloom |
-| Calendar | `.calendar` | 3:2 sheet, Monday first, no grid lines; dates are soft keys |
+| Calendar | `.calendar` | 3:2 sheet, Monday first, no grid lines |
+| Your sections | `.group` with `custom` | Text links like Bookmarks, added after it |
+| Date key | `.cal-day` | Soft tile with a thin lower edge; today is tinted and ringed in orange |
 | Day path | `.arc` | Sun walks 6 AM to 10 PM; dots mark timed work |
 | Icon key | `.dock .btn` + `.fold` | Icon only, opens on hover to show its name |
+| Theme key | `#toggle-theme` | Cycles Light, Dark, Day and night |
 | Rotating line | `rotate()` in ui.js | One line at a time, 280ms out, 380ms in. Under the clock and in the Today rail |
 | Coming up | `.agenda` | Below the to-dos, hidden when empty |
 | Paper fan | `.cal-papers` | Tiny sheets on a date, one per note in its color |

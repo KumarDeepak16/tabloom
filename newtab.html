@@ -23,6 +23,9 @@
         <symbol id="i-gear" viewBox="0 0 24 24"><path d="M5 7h9M18 7h1M5 17h1M10 17h9" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" /><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2.6" /><circle cx="8" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2.6" /></symbol>
         <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V6M6 11.500 12 5.500l6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></symbol>
         <symbol id="i-side" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3.500" fill="none" stroke="currentColor" stroke-width="2.600" /><path d="M10 5.500v13" stroke="currentColor" stroke-width="2.600" /></symbol>
+        <symbol id="i-note" viewBox="0 0 24 24"><path d="M6 3.500h8.500L19 8v12.500H6ZM14 4v4.500h4.500M9.500 13h6M9.500 16.500h4" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.500 14.500A8 8 0 0 1 9.500 4.500a8 8 0 1 0 10 10Z" fill="none" stroke="currentColor" stroke-width="2.700" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-time" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.700" /><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" /></symbol>
         <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="2.800" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.600 5.600 7 7M17 17l1.400 1.400M18.400 5.600 17 7M7 17l-1.400 1.400" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" /></symbol>
         <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.500c0-2-3-3.200-3-7.300a6 6 0 0 1 12 0c0 4.100-3 5.300-3 7.300ZM10 21h4" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round" /></symbol>
         <symbol id="i-tidy" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="13" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="4" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="13" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /></symbol>
@@ -69,10 +72,11 @@
         </svg>
         <div class="dock">
           <button class="btn green is-open" id="new-note"><svg><use href="#i-plus" /></svg><span class="fold"><b>New note</b></span></button>
-          <button class="btn yellow" id="today-note" aria-label="Today's note"><svg><use href="#i-sun" /></svg><span class="fold"><b>Today's note</b></span></button>
+          <button class="btn yellow" id="today-note" aria-label="Today's note"><svg><use href="#i-note" /></svg><span class="fold"><b>Today's note</b></span></button>
           <button class="btn purple" id="learned-note" aria-label="What I learned"><svg><use href="#i-bulb" /></svg><span class="fold"><b>What I learned</b></span></button>
           <button class="btn" id="tidy" aria-label="Tidy"><svg><use href="#i-tidy" /></svg><span class="fold"><b>Tidy</b></span></button>
           <button class="btn" id="toggle-calendar" aria-label="Calendar"><svg><use href="#i-cal" /></svg><span class="fold"><b>Calendar</b></span></button>
+          <button class="btn" id="toggle-theme"><svg><use id="theme-icon" href="#i-sun" /></svg><span class="fold"><b id="theme-label"></b></span></button>
         </div>
       </header>
       <section class="board" id="board" aria-label="Sticky notes">
@@ -247,9 +251,10 @@
         <label class="label">Portfolio link<input class="field" id="set-portfolio" placeholder="yourname.com" autocomplete="off" /></label>
         <div class="setting">Theme
           <div class="row" id="set-theme">
-            <button class="btn is-small" data-v="auto">Auto</button>
+            <button class="btn is-small" data-v="auto">System</button>
             <button class="btn is-small" data-v="light">Light</button>
             <button class="btn is-small" data-v="dark">Dark</button>
+            <button class="btn is-small" data-v="time">Day and night</button>
           </div>
         </div>
         <div class="setting">Clock

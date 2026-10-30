@@ -205,7 +205,7 @@ body {
   padding: 0.3rem 0.65rem;
 }
 
-:root[data-side='min'] .group:nth-child(3) {
+:root[data-side='min'] .group.push {
   margin-top: 0;
 }
 
@@ -250,14 +250,14 @@ body {
 }
 
 /* Bookmarks give way first on short screens: the list scrolls, every other section stays. */
-.group:first-child {
+.group:has(> .marks) {
   flex: 0 1 auto;
   display: flex;
   flex-direction: column;
   min-height: 4.5rem;
 }
 
-.group:nth-child(3) {
+.group.push {
   margin-top: auto;
 }
 
@@ -299,7 +299,6 @@ body {
   margin: 0;
   padding: 0 0 0.14rem;
   overflow-y: auto;
-  scrollbar-width: none;
   list-style: none;
 }
 
@@ -431,7 +430,7 @@ body {
 }
 
 .time {
-  flex: 0 1 21rem;
+  flex: 0 1 24rem;
   min-width: 0;
 }
 
@@ -492,7 +491,8 @@ body {
 
 /* The day as a path: the sun walks it, timed work sits on it. */
 .arc {
-  flex: 1;
+  flex: 1 1 0;
+  width: 0;
   min-width: 0;
   height: 5.6rem;
   overflow: visible;
@@ -767,8 +767,6 @@ body {
   margin: 0;
   padding: 0;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
   list-style: none;
 }
 
@@ -832,31 +830,32 @@ body {
 }
 
 .deck.has-earlier .today {
-  margin-bottom: 2.75rem;
+  margin-bottom: 3rem;
 }
 
+/* Earlier days: a small key under Today that opens into a full sheet over it. */
 .earlier {
-  --tab: 3.4rem;
   position: absolute;
   z-index: 0;
-  top: calc(100% - var(--tab));
-  right: 0.55rem;
-  left: 0.55rem;
+  right: 0;
+  bottom: 0.26rem;
+  left: 0;
   display: flex;
   flex-direction: column;
-  height: calc(100% - 0.6rem);
-  border-radius: var(--r-l) var(--r-l) 0 0;
-  background: var(--paper-orange);
-  color: var(--on-color);
-  box-shadow: inset 0 0 0 0.11rem var(--paper-orange-edge);
-  transition: transform 0.42s var(--glide), z-index 0s 0.42s;
+  height: 2.5rem;
+  overflow: hidden;
+  border-radius: var(--r-m);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 0.11rem var(--line), 0 0.22rem 0 var(--line);
+  transition: height 0.42s var(--glide), border-radius 0.42s var(--glide), z-index 0s 0.42s;
 }
 
 .earlier.open {
   z-index: 2;
+  height: calc(100% - 0.26rem);
   border-radius: var(--r-l);
-  transform: translateY(calc(-100% + var(--tab)));
-  transition: transform 0.42s var(--glide), z-index 0s;
+  transition: height 0.42s var(--glide), border-radius 0.42s var(--glide), z-index 0s;
 }
 
 .earlier-tab {
@@ -865,30 +864,43 @@ body {
   gap: 0.5rem;
   flex: none;
   width: 100%;
-  height: var(--tab);
-  padding: 0.65rem 0.95rem 0;
+  height: 2.5rem;
+  padding: 0 0.85rem;
   border: 0;
   border-radius: inherit;
   background: none;
   color: inherit;
-  font: 900 0.95rem/1 Nunito, 'Segoe UI', sans-serif;
+  font: 800 0.88rem/1 Nunito, 'Segoe UI', sans-serif;
   cursor: pointer;
+}
+
+/* A dot in the color of unfinished work. */
+.earlier-tab::before {
+  content: '';
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--orange) 20%, transparent);
 }
 
 .earlier-tab span {
   margin-left: auto;
-  font-size: 0.82rem;
-  font-weight: 800;
-  opacity: 0.72;
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 
 .earlier-tab svg {
   flex: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--muted);
   transition: transform 0.3s var(--spring);
 }
 
-.earlier.open .earlier-tab {
-  padding-top: 0;
+.earlier-tab:hover svg {
+  transform: translateY(-0.1rem);
 }
 
 .earlier.open .earlier-tab svg {
@@ -900,37 +912,19 @@ body {
   min-height: 0;
   padding: 0 0.95rem 0.8rem;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--paper-orange-edge) transparent;
 }
 
 .earlier-list h3 {
   margin: 0.5rem 0 0.1rem;
+  color: var(--muted);
   font-size: 0.8rem;
   font-weight: 900;
-  opacity: 0.68;
 }
 
 .tasks-flat {
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.earlier .check {
-  border-color: var(--on-color);
-  opacity: 0.8;
-}
-
-.earlier .btn {
-  --c: #fff;
-  --e: var(--paper-orange-edge);
-  --fg: var(--on-color);
-}
-
-.earlier .todo.done .task-body span {
-  color: inherit;
-  opacity: 0.6;
 }
 
 /* Bloom */
@@ -1107,8 +1101,6 @@ body {
   height: 100%;
   padding: 0.5rem 0;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ne) transparent;
   color: var(--on-color);
   font: 600 1.12rem/1.65 Nunito, 'Segoe UI', sans-serif;
 }
@@ -1325,14 +1317,33 @@ body {
   position: relative;
   min-width: 0;
   padding: 0;
-  border: 0.1rem solid transparent;
-  border-radius: 0.8rem;
-  background: none;
+  border: 0.14rem solid transparent;
+  border-radius: 0.85rem;
+  background-color: color-mix(in srgb, var(--sunken) 62%, transparent);
   background-clip: padding-box;
+  box-shadow: inset 0 -0.12rem 0 color-mix(in srgb, var(--line) 75%, transparent);
   color: var(--ink);
   font: 800 0.82rem/1 Nunito, 'Segoe UI', sans-serif;
   cursor: pointer;
-  transition: background-color 0.1s linear;
+  transition: background-color 0.1s linear, transform 0.14s var(--spring);
+}
+
+.cal-day.weekend {
+  background-color: color-mix(in srgb, var(--orange) 6%, var(--sunken));
+}
+
+.cal-day.outside {
+  background-color: color-mix(in srgb, var(--sunken) 24%, transparent);
+  box-shadow: none;
+}
+
+.cal-day.is-today {
+  background-color: color-mix(in srgb, var(--orange) 15%, var(--surface));
+  box-shadow: inset 0 0 0 0.09rem color-mix(in srgb, var(--orange) 45%, transparent), inset 0 -0.16rem 0 color-mix(in srgb, var(--orange) 45%, transparent);
+}
+
+.cal-day:active {
+  transform: translateY(0.07rem);
 }
 
 .cal-day span {
@@ -1356,7 +1367,7 @@ body {
 }
 
 .cal-day:hover {
-  background-color: var(--sunken);
+  background-color: color-mix(in srgb, var(--orange) 11%, var(--sunken));
 }
 
 .cal-day.weekend span,
@@ -1470,8 +1481,6 @@ body {
   gap: 0.75rem;
   padding: 0.15rem 0.2rem 0.45rem;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
 }
 
 .day-card {

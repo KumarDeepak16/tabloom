@@ -13,19 +13,33 @@ async function asDataUrl(response) {
   return `data:${type};base64,${btoa(String.fromCharCode(...bytes))}`;
 }
 
+// Google's copy of a site's icon, for browsers with no icon cache of their own. Local names stay private.
+export function remoteFavicon(pageUrl) {
+  const host = new URL(pageUrl).hostname;
+  if (!host.includes('.') || /^[\d.]+$/.test(host)) return '';
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+}
+
+async function browserFavicon(pageUrl) {
+  try {
+    globe ??= await asDataUrl(await fetch(faviconUrl('https://tabula.invalid/')));
+    const local = await asDataUrl(await fetch(faviconUrl(pageUrl)));
+    return local === globe ? '' : local;
+  } catch {
+    return ''; // no _favicon support in this browser
+  }
+}
+
 let globe;
 
 // A copy kept with the link, so the icon shows offline and for sites not visited in this browser.
 // Browser cache first; Google's icon service only when the browser has none. Returns '' if neither has one.
 export async function saveFavicon(pageUrl) {
+  const local = await browserFavicon(pageUrl);
+  if (local) return local;
   try {
-    globe ??= await asDataUrl(await fetch(faviconUrl('https://tabula.invalid/')));
-    const local = await asDataUrl(await fetch(faviconUrl(pageUrl)));
-    if (local !== globe) return local;
-
-    const host = new URL(pageUrl).hostname;
-    if (!host.includes('.') || /^[\d.]+$/.test(host)) return ''; // localhost and LAN names stay private
-    return await asDataUrl(await fetch(`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`));
+    const remote = remoteFavicon(pageUrl);
+    return remote ? await asDataUrl(await fetch(remote)) : '';
   } catch {
     return '';
   }

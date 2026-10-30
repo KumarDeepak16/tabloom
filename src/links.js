@@ -1,6 +1,6 @@
 import { state, save, flush } from './store.js';
 import { allBookmarks, defaultLinks } from './defaults.js';
-import { faviconUrl, saveFavicon } from './favicon.js';
+import { faviconUrl, remoteFavicon, saveFavicon } from './favicon.js';
 import { addToGroup, safeUrl } from './lib.js';
 import { openMenu, toast } from './ui.js';
 
@@ -34,7 +34,9 @@ function iconImg(item, url) {
   img.alt = '';
   img.decoding = 'async';
   img.onerror = () => {
-    if (url && img.src !== faviconUrl(url)) img.src = faviconUrl(url);
+    if (!url) return;
+    if (img.src !== faviconUrl(url)) img.src = faviconUrl(url);
+    else img.src = remoteFavicon(url);
   };
   return img;
 }
@@ -76,11 +78,15 @@ function showMenu(x, y, group, item) {
 function removeItem(group, item) {
   const at = group.items.indexOf(item);
   if (at < 0) return;
+  const position = state.links.indexOf(group);
   group.items.splice(at, 1);
+  // A section the user made goes away with its last link.
+  if (group.custom && !group.items.length) state.links.splice(position, 1);
   commit();
   toast(`${item.name} removed`, {
     label: 'Undo',
     run: () => {
+      if (!state.links.includes(group)) state.links.splice(position, 0, group);
       group.items.splice(at, 0, item);
       commit();
     },
@@ -98,7 +104,7 @@ export function renderLinks() {
   groupsEl.replaceChildren(
     ...state.links.map((group) => {
       const section = document.createElement('section');
-      section.className = 'group';
+      section.className = `group${group.id === 'ai' ? ' push' : ''}`;
       section.style.setProperty('--hue', `var(--${group.hue}-edge)`);
 
       const head = document.createElement('div');

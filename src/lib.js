@@ -4,6 +4,9 @@
 export const localDay = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
+// Day and night theme: light from 7 AM until 7 PM.
+export const timeTheme = (d = new Date()) => (d.getHours() >= 7 && d.getHours() < 19 ? 'light' : 'dark');
+
 export function daysBefore(day, n) {
   const [y, m, d] = day.split('-').map(Number);
   return localDay(new Date(y, m - 1, d - n));
@@ -168,6 +171,19 @@ export function addClip(data, kind, { text, url, title, day, heading, now, id })
     paper(source ? `${clean}\n\n${source}` : clean, 'blue');
   }
   return true;
+}
+
+const SECTION_HUES = ['blue', 'green', 'purple', 'orange', 'pink'];
+
+// A section the user names, shown as text links after Bookmarks. The same name reuses the one that exists.
+export function addSection(links, title, id) {
+  const name = title.trim();
+  const found = links.find((g) => g.title.toLowerCase() === name.toLowerCase());
+  if (found) return found;
+  const count = links.filter((g) => g.custom).length;
+  const group = { id, title: name, hue: SECTION_HUES[count % SECTION_HUES.length], style: 'text', custom: true, items: [] };
+  links.splice(links.findLastIndex((g) => g.style === 'text') + 1, 0, group);
+  return group;
 }
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;

@@ -121,6 +121,48 @@ textarea,
   user-select: text;
 }
 
+/* Slim pill on a clear track that warms up on hover. No scrollbar-width or scrollbar-color
+   here: Chromium ignores these rules as soon as either is set. */
+::-webkit-scrollbar {
+  width: 0.62rem;
+  height: 0.62rem;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 0.19rem solid transparent;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--ink) 20%, transparent) padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--yellow), var(--orange) 55%, var(--pink)) padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--orange) padding-box;
+}
+
+/* Notes sit on paper in both themes, so the pill follows the paper's ink. */
+.editor ::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--on-color) 24%, transparent) padding-box;
+}
+
+.editor ::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--on-color) 48%, transparent) padding-box;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--ink) 20%, transparent) transparent;
+  }
+}
+
 [hidden] {
   display: none !important;
 }

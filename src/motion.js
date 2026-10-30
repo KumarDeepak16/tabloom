@@ -104,12 +104,16 @@ export function drawBubbles({ ctx, t, w, h, pointer, sprites }) {
 }
 
 const SNAKE_STEP = 0.2; // seconds per cell
-const SNAKE_MIN = 5;
+const SNAKE_MIN = 8;
 const SNAKE_MAX = 26;
 const snake = { body: [], food: null, tick: 0, length: SNAKE_MIN, flash: 0 };
 
+// Food stays in the middle of the screen, so the snake plays out in the open, not under the side panels.
 function newFood(cols, rows) {
-  snake.food = { c: Math.floor(Math.random() * cols), r: Math.floor(Math.random() * rows) };
+  snake.food = {
+    c: Math.floor(cols * (0.28 + Math.random() * 0.44)),
+    r: Math.floor(rows * (0.2 + Math.random() * 0.7)),
+  };
 }
 
 // A snake plays itself on the dot grid. It grows with each dot, then sheds and starts again.
@@ -117,7 +121,7 @@ export function drawSnake({ ctx, t, w, h, step, sprites, glows }) {
   const cell = step * 2;
   const cols = Math.ceil(w / cell);
   const rows = Math.ceil(h / cell);
-  if (!snake.body.length) snake.body = [{ c: 2, r: Math.floor(rows / 2) }];
+  if (!snake.body.length) snake.body = [{ c: Math.floor(cols / 2), r: Math.floor(rows / 2) }];
   if (!snake.food || snake.food.c >= cols || snake.food.r >= rows) newFood(cols, rows);
 
   for (let guard = 0; guard < 6 && t - snake.tick > SNAKE_STEP; guard++) {
@@ -146,7 +150,7 @@ export function drawSnake({ ctx, t, w, h, step, sprites, glows }) {
   const lit = Math.max(0, 1 - (t - snake.flash) * 2.5);
   snake.body.forEach(({ c, r }, i) => {
     const k = 1 - i / snake.body.length;
-    const size = 2 + k * 3 + lit;
+    const size = 2.5 + k * 3.5 + lit;
     ctx.globalAlpha = 0.25 + k * 0.7;
     ctx.drawImage(sprites[i % 5], c * cell + cell / 2 - size, r * cell + cell / 2 - size, size * 2, size * 2);
   });

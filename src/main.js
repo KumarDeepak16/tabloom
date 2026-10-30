@@ -1,5 +1,6 @@
+import './compat.js';
 import { state, load, save, flush, onRemote, onSaveFailed } from './store.js';
-import { localDay, safeUrl, validBackup } from './lib.js';
+import { localDay, safeUrl, timeTheme, validBackup } from './lib.js';
 import { initDots, setMotion } from './dots.js';
 import { applyPhoto, applyPhotoLook, removePhoto, setPhotoLink, uploadPhoto } from './photo.js';
 import { initTooltips, toast } from './ui.js';
@@ -54,6 +55,7 @@ function tick() {
     renderBloom(grew && !firstPaint);
     renderCalendar();
   }
+  if (state.settings.theme === 'time') applyTheme();
   paintHeader();
   renderAgenda();
   syncMeetings();
@@ -61,13 +63,39 @@ function tick() {
   setTimeout(tick, 60000 - (now.getSeconds() * 1000 + now.getMilliseconds()) + 20);
 }
 
+const THEME_KEY = {
+  light: ['i-sun', 'Light'],
+  dark: ['i-moon', 'Dark'],
+  time: ['i-time', 'Day and night'],
+  auto: ['i-time', 'System'],
+};
+
 function applyTheme() {
   const { theme } = state.settings;
-  if (theme === 'auto') delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = theme;
+  const shown = theme === 'time' ? timeTheme() : theme;
+  if (shown === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = shown;
+  const [icon, label] = THEME_KEY[theme] ?? THEME_KEY.auto;
+  $('theme-icon').setAttribute('href', `#${icon}`);
+  $('theme-label').textContent = label;
+  $('toggle-theme').setAttribute('aria-label', `Theme: ${label}`);
   try {
     localStorage.setItem('tabula-theme', theme);
   } catch {}
+}
+
+// Header key: Light, Dark, then Day and night. System stays available in Settings.
+function cycleTheme() {
+  const { theme } = state.settings;
+  const current = theme === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+  const order = ['light', 'dark', 'time'];
+  state.settings.theme = order[(order.indexOf(current) + 1) % order.length];
+  save('settings');
+  applyTheme();
+  $('toggle-theme').querySelector('svg').animate(
+    [{ transform: 'rotate(-90deg) scale(0.6)' }, { transform: 'none' }],
+    { duration: 360, easing: 'cubic-bezier(0.3, 1.5, 0.5, 1)' },
+  );
 }
 
 function applySide() {
@@ -272,6 +300,7 @@ function bindUi() {
   $('toggle-today').onclick = toggleToday;
   $('rail-open').onclick = toggleToday;
   $('toggle-calendar').onclick = toggleCalendar;
+  $('toggle-theme').onclick = cycleTheme;
 
   const openSettings = () => {
     paintSettings();

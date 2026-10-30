@@ -1,0 +1,52 @@
+# Publishes a release whenever the version in manifest.json changes on main.
+# The asset names never change, so this link always gives the newest build:
+# https://github.com/KumarDeepak16/tabloom/releases/latest/download/tabloom.zip
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [manifest.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: version
+        run: |
+          version="v$(jq -r .version manifest.json)"
+          echo "tag=$version" >> "$GITHUB_OUTPUT"
+          if git rev-parse "$version" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build packages
+        if: steps.version.outputs.exists != 'true'
+        run: |
+          git archive --format=zip --prefix=tabloom/ -o tabloom.zip HEAD
+
+          # Firefox has no _favicon support and runs the background file as a script.
+          mkdir firefox
+          git archive HEAD | tar -x -C firefox
+          jq '.permissions -= ["favicon"]
+            | .background = {scripts: ["src/sw.js"], type: "module"}
+            | del(.minimum_chrome_version)
+            | .browser_specific_settings = {gecko: {id: "tabloom@1619.in", strict_min_version: "128.0"}}' \
+            manifest.json > firefox/manifest.json
+          (cd firefox && zip -qr ../tabloom-firefox.zip .)
+
+      - name: Publish release
+        if: steps.version.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: gh release create "$TAG" tabloom.zip tabloom-firefox.zip --title "Tabloom $TAG" --generate-notes

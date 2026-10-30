@@ -2,24 +2,67 @@
 
 Your new tab, in bloom. A colorful new tab for work. Bookmarks, Google apps and AI tools on the side. Sticky notes, today's tasks and a small plant that grows with you everywhere else.
 
-![Tabloom on a 14 inch laptop](docs/preview.png)
+![Tabloom with its work calendar](docs/calendar.jpg)
+
+**Website:** [tabloom.1619.in](https://tabloom.1619.in/)
+
+## Download
+
+**[Download the latest Tabloom](https://github.com/KumarDeepak16/tabloom/releases/latest/download/tabloom.zip)**, or see all [releases](https://github.com/KumarDeepak16/tabloom/releases).
 
 ## Install
 
-Clone this repo, or use **Code > Download ZIP** on GitHub and unzip it.
+Works in every Chromium browser, version 111 or newer.
 
-1. Open `chrome://extensions` (Edge: `edge://extensions`).
-2. Turn on **Developer mode**.
-3. Click **Load unpacked** and pick the unzipped folder.
-4. Open a new tab. When the browser asks, keep Tabloom's new tab page.
+1. Unzip `tabloom.zip` somewhere it can stay.
+2. Open your browser's extensions page, from the table below.
+3. Turn on **Developer mode**.
+4. Click **Load unpacked** and pick the unzipped `tabloom` folder.
+5. Open a new tab. When the browser asks, keep Tabloom's new tab page.
+
+| Browser | Extensions page |
+| --- | --- |
+| Chrome | `chrome://extensions` |
+| Edge | `edge://extensions` |
+| Brave | `brave://extensions` |
+| Opera | `opera://extensions` |
+| Vivaldi | `vivaldi://extensions` |
 
 Keep the folder where it is. The browser loads the extension from it on every start, and moving it makes the browser treat it as a new extension with empty data.
 
 The first time, Tabloom asks your name and offers to restore a backup or add browser bookmarks.
 
+### Firefox (beta)
+
+Firefox is not a Chromium browser, so it has its own build, and that build has not been tested yet.
+
+1. Download [tabloom-firefox.zip](https://github.com/KumarDeepak16/tabloom/releases/latest/download/tabloom-firefox.zip) and unzip it.
+2. Open `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on** and pick `manifest.json`.
+
+Firefox removes temporary add-ons when it closes. A permanent install needs the add-on to be signed by Mozilla.
+
 ### Update
 
-Replace the files in the same folder, then press the reload icon on Tabloom's card in `chrome://extensions`. Your notes and links stay. New default links are added once.
+Download the latest zip, replace the files in the same folder, then press the reload icon on Tabloom's card on the extensions page. Your notes and links stay. New default links are added once.
+
+## Screens
+
+| | |
+| --- | --- |
+| ![A date opened into its notes and work](docs/day.jpg) | ![Floating sticky notes](docs/notes.jpg) |
+| A date opens into everything on it | Calendar off, notes float |
+| ![Dark theme](docs/dark.jpg) | ![Today panel collapsed](docs/rail.jpg) |
+| Dark, or Day and night by the clock | Collapse a side, tasks pass by one at a time |
+
+## Backgrounds
+
+| | | | |
+| --- | --- | --- | --- |
+| ![Dots](docs/backgrounds/dots.jpg) | ![Grid lines](docs/backgrounds/grid.jpg) | ![Aurora](docs/backgrounds/aurora.jpg) | ![Fireflies](docs/backgrounds/fireflies.jpg) |
+| Dots | Grid lines | Aurora | Fireflies |
+| ![Stars](docs/backgrounds/constellation.jpg) | ![Bubbles](docs/backgrounds/bubbles.jpg) | ![Snake](docs/backgrounds/snake.jpg) | ![Still](docs/backgrounds/still.jpg) |
+| Stars | Bubbles | Snake | Still |
 
 ## Use it
 
@@ -51,7 +94,9 @@ Replace the files in the same folder, then press the reload icon on Tabloom's ca
 | See earlier tasks | Click the card peeking out under Today. Tick them off, or move one to today with the arrow |
 | Change the background | Settings > Background animation: Dots, Grid lines, Aurora, Fireflies, Stars, Bubbles, Snake or Still |
 | Pop bubbles | In Bubbles mode, touch one with the cursor. Your count shows under the clock |
-| Save selected text from any page | Select it, right-click, **Add to Tabloom**, then Notes, What I learned or To-do. A green tick on the toolbar icon confirms it |
+| Save selected text from any page | Select it, right-click, **Add to Tabloom**, then Notes, What I learned or To-do. Notes and What I learned each have a "with page link" choice. A green tick on the toolbar icon confirms it |
+| Save a link or page to any section | Right-click it, **Save link to Tabloom**. Pick a section, or **New section** to create one like Certificates. The toolbar icon offers the same. A new section disappears with its last link |
+| Switch theme | The theme key in the header cycles Light, Dark, then Day and night, which is light from 7 AM to 7 PM and dark otherwise. Settings also offers System |
 | See your meetings | Paste your Google Calendar secret iCal address in Settings. The next two appear under your to-dos with a Join button, and as dots on the day path |
 | See recent Google docs | Settings > Recent Google docs > Show, then allow history access |
 | Read the header | The sun walks the day from 6 AM to 10 PM. Dots on the path are timed tasks and meetings; hover one. Hover the icon keys for their names |

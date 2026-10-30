@@ -20,11 +20,4 @@ There is no build step and no runtime dependency. The extension is plain HTML, C
 
 ## Make a release
 
-1. Raise `version` in `manifest.json` and commit.
-2. Build the zip. Files marked `export-ignore` in `.gitattributes` stay out of it:
-
-   ```sh
-   git archive --format=zip --prefix=tabloom/ -o tabloom.zip HEAD
-   ```
-
-3. Attach the zip to a GitHub release.
+Raise `version` in `manifest.json` and push to `main`. The Release workflow then builds `tabloom.zip` and `tabloom-firefox.zip` and publishes them. Files marked `export-ignore` in `.gitattributes` stay out of the packages.

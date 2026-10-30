@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Tabloom",
-  "version": "1.3.0",
-  "homepage_url": "https://github.com/KumarDeepak16/tabloom",
+  "version": "1.4.0",
+  "minimum_chrome_version": "111",
+  "homepage_url": "https://tabloom.1619.in/",
   "description": "Your new tab, in bloom: work calendar, sticky notes, tasks, bookmarks and every tool you use.",
   "chrome_url_overrides": { "newtab": "newtab.html" },
   "permissions": ["storage", "unlimitedStorage", "favicon", "bookmarks", "activeTab", "contextMenus"],
