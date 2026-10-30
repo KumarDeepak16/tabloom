@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>New Tab</title>
+    <link rel="icon" href="assets/logo/32.png" />
+    <link rel="preload" href="assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/ui.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <script src="src/theme.js"></script>
+    <script type="module" src="src/main.js"></script>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" /></symbol>
+        <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" /></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24"><path d="M5 7h9M18 7h1M5 17h1M10 17h9" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" /><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2.6" /><circle cx="8" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2.6" /></symbol>
+        <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V6M6 11.500 12 5.500l6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-side" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3.500" fill="none" stroke="currentColor" stroke-width="2.600" /><path d="M10 5.500v13" stroke="currentColor" stroke-width="2.600" /></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="2.800" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.600 5.600 7 7M17 17l1.400 1.400M18.400 5.600 17 7M7 17l-1.400 1.400" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" /></symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.500c0-2-3-3.200-3-7.300a6 6 0 0 1 12 0c0 4.100-3 5.300-3 7.300ZM10 21h4" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-tidy" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="13" y="4" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="4" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /><rect x="13" y="13" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2.600" /></symbol>
+        <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5.500" width="16" height="14.500" rx="3.200" fill="none" stroke="currentColor" stroke-width="2.600" /><path d="M4 10.500h16M8.500 3.500v3.500M15.500 3.500v3.500" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" /></symbol>
+        <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.6 2.2c.6 3.6-1 5-2.6 6.8-.3-1-.8-1.700-1.600-2.300C6.400 8.800 5 11.100 5 13.800 5 18.100 8 21.500 12 21.500s7-3.200 7-7.500c0-4.900-3.300-8.800-6.400-11.800Z" fill="var(--orange)" /><path d="M12.100 12.200c.3 1.800-2.600 2.800-2.600 5.200 0 1.900 1.100 3 2.600 3s2.700-1.200 2.700-3c0-2.100-1.500-3.600-2.700-5.200Z" fill="var(--yellow)" /></symbol>
+      </defs>
+    </svg>
+
+    <div id="photo" aria-hidden="true" hidden><img alt="" /><i></i></div>
+    <div id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    <canvas id="dots" aria-hidden="true"></canvas>
+
+    <aside class="side" aria-label="Links">
+      <header class="brand">
+        <a href="https://1619.in" aria-label="Made by Deepak Kumar, 1619.in" data-tip="Made by Deepak Kumar, 1619.in"><img src="assets/logo/logo.svg" alt="" width="26" height="26" /></a>
+        <span>Tabloom</span>
+        <a class="btn is-small yellow" id="portfolio">My portfolio</a>
+        <button class="btn is-small is-square" id="toggle-side"><svg><use href="#i-side" /></svg></button>
+        <button class="btn is-small is-square" id="open-settings" aria-label="Settings" data-tip="Settings">
+          <svg><use href="#i-gear" /></svg>
+        </button>
+      </header>
+      <div id="groups"></div>
+    </aside>
+
+    <main class="work">
+      <header class="top">
+        <div class="time">
+          <div class="clock"><span id="clock-digits" role="img"></span><small id="clock-ampm"></small></div>
+          <p class="date"><span id="date"></span></p>
+        </div>
+        <svg class="arc" id="day-arc" viewBox="0 0 400 96" aria-hidden="true">
+          <defs>
+            <linearGradient id="arc-warm" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#ffb020" />
+              <stop offset=".6" stop-color="#ff6a55" />
+              <stop offset="1" stop-color="#ff5c8a" />
+            </linearGradient>
+          </defs>
+          <path class="arc-base" d="M14 84C110 8 290 8 386 84" />
+          <path class="arc-done" d="M14 84C110 8 290 8 386 84" />
+          <g class="arc-marks"></g>
+          <g class="arc-sun"><g><circle class="arc-glow" r="15" /><circle class="arc-core" r="8" /></g></g>
+        </svg>
+        <div class="dock">
+          <button class="btn green is-open" id="new-note"><svg><use href="#i-plus" /></svg><span class="fold"><b>New note</b></span></button>
+          <button class="btn yellow" id="today-note" aria-label="Today's note"><svg><use href="#i-sun" /></svg><span class="fold"><b>Today's note</b></span></button>
+          <button class="btn purple" id="learned-note" aria-label="What I learned"><svg><use href="#i-bulb" /></svg><span class="fold"><b>What I learned</b></span></button>
+          <button class="btn" id="tidy" aria-label="Tidy"><svg><use href="#i-tidy" /></svg><span class="fold"><b>Tidy</b></span></button>
+          <button class="btn" id="toggle-calendar" aria-label="Calendar"><svg><use href="#i-cal" /></svg><span class="fold"><b>Calendar</b></span></button>
+        </div>
+      </header>
+      <section class="board" id="board" aria-label="Sticky notes">
+        <section class="calendar" id="calendar" aria-label="Work calendar" hidden>
+          <header class="cal-head">
+            <h2><span id="cal-month"></span> <small id="cal-year"></small></h2>
+            <div class="row">
+              <button class="btn is-small is-square" id="cal-prev" aria-label="Previous month" data-tip="Previous month"><svg><use href="#i-back" /></svg></button>
+              <button class="btn is-small" id="cal-today">Today</button>
+              <button class="btn is-small is-square cal-forward" id="cal-next" aria-label="Next month" data-tip="Next month"><svg><use href="#i-back" /></svg></button>
+              <button class="btn is-small green" id="cal-add"><svg><use href="#i-plus" /></svg>Add work</button>
+            </div>
+          </header>
+          <div class="cal-names" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          <div class="cal-weeks" id="cal-weeks"></div>
+          <footer class="cal-foot" id="cal-foot"></footer>
+          <section class="day" id="day" aria-label="Day" hidden>
+            <header class="day-head">
+              <div>
+                <h3 id="day-title"></h3>
+                <p id="day-sub"></p>
+              </div>
+              <div class="row">
+                <button class="btn is-small green" id="day-note"><svg><use href="#i-plus" /></svg>New note</button>
+                <button class="btn is-small" id="day-work">Add work</button>
+                <button class="btn is-small is-square" id="day-close" aria-label="Close day" data-tip="Close"><svg><use href="#i-close" /></svg></button>
+              </div>
+            </header>
+            <div class="day-works" id="day-works"></div>
+            <div class="day-notes" id="day-notes"></div>
+          </section>
+        </section>
+        <div class="board-empty" id="board-empty" hidden>
+          <p>Your board is clear. Press N to start a note.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="deck" id="deck">
+    <aside class="today" aria-label="Today">
+      <header class="today-head">
+        <h2>Today</h2>
+        <span class="streak" id="streak" data-tip="Days in a row with a finished task" hidden>
+          <svg width="20" height="20"><use href="#i-flame" /></svg><b id="streak-days"></b>
+        </span>
+        <button class="btn is-small is-square" id="toggle-today"><svg><use href="#i-side" /></svg></button>
+        <span class="today-mini" id="today-mini"></span>
+      </header>
+      <button class="rail-ticker" id="rail-open" aria-label="Open Today panel"><span id="rail-task"></span></button>
+      <div class="meter" role="progressbar" id="meter" aria-label="Tasks finished" aria-valuemin="0" aria-valuemax="100">
+        <i id="meter-fill"></i>
+      </div>
+      <p class="count" id="task-count"></p>
+      <form id="task-form">
+        <input class="field" id="task-input" placeholder="Add a task, try “3pm call”" aria-label="Add a task" autocomplete="off" maxlength="200" />
+      </form>
+      <ul class="tasks" id="tasks"></ul>
+      <p class="tasks-empty" id="tasks-empty">Nothing due today. Add the first task above.</p>
+      <section class="agenda" id="agenda" aria-label="Coming up" hidden>
+        <div class="agenda-group" id="agenda-meetings" hidden></div>
+        <div class="agenda-group" id="agenda-docs" hidden></div>
+      </section>
+      <div class="bloom">
+        <button class="bloom-art" id="bloom-art"></button>
+        <div class="bloom-info">
+          <p class="bloom-title"><b id="bloom-stage"></b><span id="bloom-day"></span></p>
+          <div class="meter is-thin" aria-hidden="true"><i id="bloom-fill"></i></div>
+          <p class="bloom-next" id="bloom-next"></p>
+        </div>
+      </div>
+    </aside>
+    <section class="earlier" id="earlier" aria-label="Earlier tasks" hidden>
+      <button class="earlier-tab" id="earlier-toggle" aria-expanded="false" aria-controls="earlier-list">
+        <b id="earlier-title"></b>
+        <span id="earlier-left"></span>
+        <svg width="16" height="16"><use href="#i-up" /></svg>
+      </button>
+      <div class="earlier-list" id="earlier-list" inert></div>
+    </section>
+    </div>
+
+    <section class="editor" id="editor" hidden aria-label="Note">
+      <header class="editor-bar">
+        <button class="btn" id="ed-back"><svg><use href="#i-back" /></svg>Done</button>
+        <div class="row" role="group" aria-label="Note format">
+          <button class="btn" id="ed-md">Markdown</button>
+          <button class="btn" id="ed-text">Plain text</button>
+        </div>
+        <button class="btn" id="ed-preview">Preview</button>
+        <div class="swatches" id="ed-hues" role="group" aria-label="Note color"></div>
+        <button class="btn is-square" id="ed-delete" aria-label="Delete note" data-tip="Delete note"><svg><use href="#i-trash" /></svg></button>
+      </header>
+      <div class="editor-page">
+        <textarea id="ed-input" aria-label="Note text" placeholder="Start writing…" spellcheck="true"></textarea>
+        <article class="md editor-preview" id="ed-view" hidden></article>
+      </div>
+      <footer class="editor-foot" id="ed-foot"></footer>
+    </section>
+
+    <dialog id="link-dialog">
+      <form class="dialog-form" id="link-form" method="dialog" novalidate>
+        <h2 class="dialog-title" id="link-title"></h2>
+        <label class="label">Name<input class="field" id="link-name" maxlength="60" autocomplete="off" required /></label>
+        <label class="label">Web address<input class="field" id="link-url" placeholder="example.com" autocomplete="off" required /></label>
+        <label class="label" id="link-icon-row">Icon image address, optional
+          <input class="field" id="link-icon" placeholder="Leave empty to use the site's icon" autocomplete="off" />
+        </label>
+        <p class="error" id="link-error" hidden></p>
+        <div class="row end">
+          <button class="btn" type="button" id="link-cancel">Cancel</button>
+          <button class="btn green" type="submit">Save link</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="hello-dialog">
+      <form class="dialog-form" id="hello-form" method="dialog" novalidate>
+        <img src="assets/logo/logo.svg" alt="" width="44" height="44" />
+        <h2 class="dialog-title">Welcome to Tabloom</h2>
+        <label class="label">Your name<input class="field" id="hello-name" maxlength="30" autocomplete="given-name" required /></label>
+        <label class="label">Portfolio link, optional<input class="field" id="hello-portfolio" placeholder="yourname.com" autocomplete="off" /></label>
+        <p class="error" id="hello-portfolio-error" hidden>Enter a full web address, like yourname.com.</p>
+        <p class="error" id="hello-error" hidden></p>
+        <button class="btn green" type="submit">Start using Tabloom</button>
+        <div class="setting">Already have your setup?
+          <div class="row">
+            <button class="btn is-small" type="button" id="hello-restore">Restore backup file</button>
+            <button class="btn is-small" type="button" id="hello-picker">Add browser bookmarks</button>
+          </div>
+          <p class="hint">A backup restores notes, tasks, links and settings together.</p>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="work-dialog">
+      <form class="dialog-form" id="work-form" method="dialog" novalidate>
+        <h2 class="dialog-title" id="work-heading"></h2>
+        <label class="label">What are you working on?<input class="field" id="work-title" maxlength="60" autocomplete="off" required /></label>
+        <div class="settings-grid">
+          <label class="label">Start<input class="field" id="work-start" type="date" required /></label>
+          <label class="label">End<input class="field" id="work-end" type="date" required /></label>
+          <label class="label">Time, optional<input class="field" id="work-time" type="time" /></label>
+          <div class="setting">Color<div class="swatches" id="work-hues" role="group" aria-label="Work color"></div></div>
+        </div>
+        <p class="error" id="work-error" hidden></p>
+        <div class="row end">
+          <button class="btn" type="button" id="work-delete" style="margin-right: auto">Delete</button>
+          <button class="btn" type="button" id="work-cancel">Cancel</button>
+          <button class="btn green" type="submit">Save work</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="pick-dialog">
+      <div class="dialog-form">
+        <h2 class="dialog-title">Add browser bookmarks</h2>
+        <input class="field" id="pick-filter" placeholder="Search your bookmarks" aria-label="Search your bookmarks" autocomplete="off" />
+        <div class="pick-list" id="pick-list"></div>
+        <div class="row end">
+          <button class="btn" id="pick-all" style="margin-right: auto">Select all</button>
+          <button class="btn" id="pick-cancel">Cancel</button>
+          <button class="btn green" id="pick-add"></button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="settings-dialog">
+      <div class="dialog-form">
+        <h2 class="dialog-title">Settings</h2>
+        <div class="settings-grid">
+        <label class="label">Your name<input class="field" id="set-name" maxlength="30" autocomplete="off" /></label>
+        <label class="label">Portfolio link<input class="field" id="set-portfolio" placeholder="yourname.com" autocomplete="off" /></label>
+        <div class="setting">Theme
+          <div class="row" id="set-theme">
+            <button class="btn is-small" data-v="auto">Auto</button>
+            <button class="btn is-small" data-v="light">Light</button>
+            <button class="btn is-small" data-v="dark">Dark</button>
+          </div>
+        </div>
+        <div class="setting">Clock
+          <div class="row" id="set-clock">
+            <button class="btn is-small" data-v="12">12 hour</button>
+            <button class="btn is-small" data-v="24">24 hour</button>
+          </div>
+        </div>
+        <div class="setting">Bookmarks saved with the browser star
+          <div class="row" id="set-mirror">
+            <button class="btn is-small" data-v="on">Add to Tabloom</button>
+            <button class="btn is-small" data-v="off">Ignore</button>
+          </div>
+        </div>
+        <div class="setting">Home layout
+          <div class="row" id="set-calendar">
+            <button class="btn is-small" data-v="on">With calendar</button>
+            <button class="btn is-small" data-v="off">Without calendar</button>
+          </div>
+        </div>
+        <label class="setting wide">Google Calendar meetings
+          <input class="field" id="set-ical" placeholder="Paste your secret address in iCal format" autocomplete="off" spellcheck="false" />
+          <span class="hint">Google Calendar > Settings > your calendar > Integrate calendar. Keep this address private, it opens your calendar.</span>
+          <span class="error" id="set-ical-error" hidden>Paste the address that starts with https://calendar.google.com and ends in .ics.</span>
+        </label>
+        <div class="setting">Recent Google docs
+          <div class="row" id="set-docs">
+            <button class="btn is-small" data-v="on">Show</button>
+            <button class="btn is-small" data-v="off">Hide</button>
+          </div>
+        </div>
+        <div class="setting">Links
+          <div class="row">
+            <button class="btn is-small" id="import-picker">Add browser bookmarks</button>
+            <button class="btn is-small" id="restore-links">Restore default links</button>
+          </div>
+        </div>
+        <div class="setting wide">Background animation
+          <div class="row" id="set-motion">
+            <button class="btn is-small" data-v="dots">Dots</button>
+            <button class="btn is-small" data-v="grid">Grid lines</button>
+            <button class="btn is-small" data-v="aurora">Aurora</button>
+            <button class="btn is-small" data-v="fireflies">Fireflies</button>
+            <button class="btn is-small" data-v="constellation">Stars</button>
+            <button class="btn is-small" data-v="bubbles">Bubbles</button>
+            <button class="btn is-small" data-v="snake">Snake</button>
+            <button class="btn is-small" data-v="still">Still</button>
+          </div>
+        </div>
+        <div class="setting wide">Background image
+          <div class="row">
+            <button class="btn is-small" id="photo-upload">Upload image</button>
+            <button class="btn is-small" id="photo-remove">Remove image</button>
+            <input class="field" id="photo-link" style="flex: 1; width: auto; min-width: 12rem" placeholder="Or paste an image link" aria-label="Image link" autocomplete="off" />
+          </div>
+        </div>
+        <label class="slider">Blur<input type="range" id="photo-blur" min="0" max="30" /></label>
+        <label class="slider">Dim<input type="range" id="photo-dim" min="0" max="85" /></label>
+        </div>
+        <p class="error" id="set-portfolio-error" hidden>Enter a full web address, like yourname.com.</p>
+        <div class="setting">Backup of everything
+          <div class="row">
+            <button class="btn is-small" id="export-data">Export file</button>
+            <button class="btn is-small" id="import-data">Import file</button>
+          </div>
+          <p class="hint">Everything stays in this browser. Export before removing the extension or moving computer. Uploaded images are not in the file.</p>
+        </div>
+        <div class="row end"><button class="btn green" id="settings-close">Done</button></div>
+      </div>
+    </dialog>
+    <input type="file" id="import-file" accept="application/json,.json" hidden />
+    <input type="file" id="photo-file" accept="image/*" hidden />
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "tabloom",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/lib.test.mjs"
+  },
+  "license": "MIT",
+  "repository": "github:KumarDeepak16/tabloom"
+}

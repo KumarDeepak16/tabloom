@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tabloom: your new tab, in bloom</title>
+    <meta name="description" content="A free, open source new tab for Chrome and Edge with a work calendar, date-based notes, tasks, bookmarks and every tool you use." />
+    <link rel="icon" href="logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'media',
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Nunito', 'Segoe UI', 'sans-serif'] },
+            colors: {
+              cream: '#fdf5ea', paper: '#fffdf9', line: '#f0e4d3', ink: '#2c2017', muted: '#7c6a5a',
+              coffee: '#1b1410', bark: '#261d16', seam: '#3c2f25', milk: '#f8efe4', sand: '#b5a392',
+              leaf: '#58cc02', leafedge: '#46a302', amber: '#ffc800', amberedge: '#dda600',
+            },
+            boxShadow: {
+              key: '0 0.22rem 0 var(--edge)',
+              card: '0 0.28rem 0 var(--lip)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root { --lip: #f0e4d3; }
+      @media (prefers-color-scheme: dark) { :root { --lip: #3c2f25; } }
+      html { scroll-behavior: smooth; }
+      body { background-image: radial-gradient(rgb(255 138 61 / 0.2) 1px, transparent 1px); background-size: 26px 26px; }
+      .key { transition: transform 0.14s cubic-bezier(0.3, 1.5, 0.5, 1), box-shadow 0.1s linear; }
+      .key:hover { transform: translateY(-1px); }
+      .key:active { transform: translateY(3px); box-shadow: 0 0 0 var(--edge); }
+      .rise { animation: rise 0.7s cubic-bezier(0.32, 0.72, 0, 1) backwards; }
+      @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .rise, .key { animation: none; transition: none; }
+      }
+    </style>
+  </head>
+  <body class="bg-cream font-sans text-ink antialiased dark:bg-coffee dark:text-milk">
+    <header class="mx-auto flex max-w-4xl items-center justify-between px-5 py-5">
+      <a href="#" class="flex items-center gap-2 text-sm font-black">
+        <img src="logo.svg" alt="" class="h-6 w-6" />Tabloom
+      </a>
+      <nav class="flex items-center gap-5 text-xs font-extrabold text-muted dark:text-sand">
+        <a href="#features" class="hover:text-ink dark:hover:text-milk">Features</a>
+        <a href="#install" class="hover:text-ink dark:hover:text-milk">Install</a>
+        <a href="https://github.com/KumarDeepak16/tabloom" class="hover:text-ink dark:hover:text-milk">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-4xl px-5">
+      <section class="rise pb-8 pt-10 text-center">
+        <h1 class="text-3xl font-black tracking-tight sm:text-4xl">Your new tab, in bloom</h1>
+        <p class="mx-auto mt-3 max-w-md text-sm font-semibold leading-relaxed text-muted dark:text-sand">
+          A calendar for your work, notes kept on their dates, today's tasks and every tool you use, all one click from a new tab.
+        </p>
+        <div class="mt-6 flex items-center justify-center gap-3">
+          <a href="tabloom.zip" download style="--edge: #46a302" class="key rounded-xl bg-leaf px-4 py-2.5 text-sm font-extrabold text-[#2a1a0e] shadow-key">Download for Chrome</a>
+          <a href="https://github.com/KumarDeepak16/tabloom" style="--edge: var(--lip)" class="key rounded-xl bg-paper px-4 py-2.5 text-sm font-extrabold shadow-key ring-1 ring-line dark:bg-bark dark:ring-seam">View source</a>
+        </div>
+        <p class="mt-3 text-xs font-bold text-muted dark:text-sand">Free and open source. Works in Chrome and Edge.</p>
+      </section>
+
+      <figure class="rise overflow-hidden rounded-2xl shadow-card ring-1 ring-line dark:ring-seam" style="animation-delay: 0.1s">
+        <picture>
+          <source srcset="shots/dark.jpg" media="(prefers-color-scheme: dark)" />
+          <img src="shots/calendar.jpg" alt="Tabloom new tab with a month calendar, sidebar of links and the Today panel" width="1536" height="800" class="w-full" />
+        </picture>
+      </figure>
+
+      <section id="features" class="pt-16">
+        <h2 class="text-lg font-black">What's inside</h2>
+        <dl class="mt-5 grid gap-x-8 gap-y-5 text-sm sm:grid-cols-2">
+          <div><dt class="font-extrabold">Work calendar</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Drag across days to plan a job. Bars show how long each one runs and how many days are left.</dd></div>
+          <div><dt class="font-extrabold">Notes on their dates</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Click a date and it opens into that day's notes and work. Or switch the calendar off and let notes float.</dd></div>
+          <div><dt class="font-extrabold">Markdown or plain text</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Every note opens full page. New note reuses an empty one, so blanks never pile up.</dd></div>
+          <div><dt class="font-extrabold">Today panel</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Tasks, a progress bar and a streak. Earlier days wait in a card tucked underneath.</dd></div>
+          <div><dt class="font-extrabold">Bloom</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">A small plant that grows every day you show up, and never wilts.</dd></div>
+          <div><dt class="font-extrabold">Save from anywhere</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Select text on any page and right-click to send it to notes, What I learned or to-dos.</dd></div>
+          <div><dt class="font-extrabold">All your links</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Bookmarks, Google Workspace, AI tools and social, with real icons. Add your own or import in bulk.</dd></div>
+          <div><dt class="font-extrabold">Meetings and recent docs</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Connect your calendar's private link to see what's next, with a Join button.</dd></div>
+          <div><dt class="font-extrabold">Your background</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Dots, grid lines, aurora, fireflies, stars, bubbles or a snake that plays itself. Or your own image with blur.</dd></div>
+          <div><dt class="font-extrabold">Made for small laptops</dt><dd class="mt-0.5 font-semibold leading-relaxed text-muted dark:text-sand">Everything scales from a 14 inch screen upward. Collapse either side when you want room.</dd></div>
+        </dl>
+      </section>
+
+      <section class="pt-16">
+        <h2 class="text-lg font-black">A closer look</h2>
+        <div class="mt-5 grid gap-5 sm:grid-cols-2">
+          <figure><img src="shots/day.jpg" alt="A date opened into its notes and work" loading="lazy" class="rounded-xl ring-1 ring-line dark:ring-seam" /><figcaption class="mt-2 text-xs font-bold text-muted dark:text-sand">A date opens into everything on it</figcaption></figure>
+          <figure><img src="shots/notes.jpg" alt="Floating sticky notes without the calendar" loading="lazy" class="rounded-xl ring-1 ring-line dark:ring-seam" /><figcaption class="mt-2 text-xs font-bold text-muted dark:text-sand">Without the calendar, notes float</figcaption></figure>
+          <figure><img src="shots/editor.jpg" alt="A note open full page with Markdown" loading="lazy" class="rounded-xl ring-1 ring-line dark:ring-seam" /><figcaption class="mt-2 text-xs font-bold text-muted dark:text-sand">Full page notes with Markdown</figcaption></figure>
+          <figure><img src="shots/rail.jpg" alt="The Today panel collapsed to a thin rail" loading="lazy" class="rounded-xl ring-1 ring-line dark:ring-seam" /><figcaption class="mt-2 text-xs font-bold text-muted dark:text-sand">Collapse the panel, tasks pass by one at a time</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="install" class="pt-16">
+        <h2 class="text-lg font-black">Install in a minute</h2>
+        <ol class="mt-5 grid gap-3 text-sm font-semibold sm:grid-cols-2">
+          <li class="flex gap-3"><b class="font-black text-[#e0691f]">1</b><span><a href="tabloom.zip" download class="font-extrabold underline underline-offset-2">Download the zip</a> and unzip it somewhere you'll keep it.</span></li>
+          <li class="flex gap-3"><b class="font-black text-[#e0691f]">2</b><span>Open <code class="text-xs font-bold">chrome://extensions</code> and turn on Developer mode.</span></li>
+          <li class="flex gap-3"><b class="font-black text-[#e0691f]">3</b><span>Click Load unpacked and pick the unzipped folder.</span></li>
+          <li class="flex gap-3"><b class="font-black text-[#e0691f]">4</b><span>Open a new tab and keep Tabloom when the browser asks.</span></li>
+        </ol>
+      </section>
+
+      <section class="pt-16">
+        <h2 class="text-lg font-black">Your data stays yours</h2>
+        <p class="mt-3 max-w-xl text-sm font-semibold leading-relaxed text-muted dark:text-sand">
+          No account and no tracking. Notes, tasks and links stay in your browser, and you can export them to a file at any time.
+          Removing the extension deletes them, so export first.
+        </p>
+      </section>
+    </main>
+
+    <footer class="mx-auto mt-16 flex max-w-4xl items-center justify-between px-5 pb-8 text-xs font-bold text-muted dark:text-sand">
+      <span>MIT License</span>
+      <a href="https://github.com/KumarDeepak16/tabloom" class="hover:text-ink dark:hover:text-milk">GitHub</a>
+    </footer>
+
+    <a href="https://1619.in" aria-label="Made by Deepak Kumar, 1619.in" class="group fixed bottom-4 right-4 flex items-center rounded-full bg-paper p-1 shadow-lg ring-1 ring-line dark:bg-bark dark:ring-seam">
+      <img src="logo.svg" alt="" class="h-6 w-6 transition-transform duration-300 group-hover:-rotate-12 group-focus-visible:-rotate-12" />
+      <span class="max-w-0 overflow-hidden whitespace-nowrap text-xs font-extrabold opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:mr-2 group-hover:max-w-[13rem] group-hover:opacity-100 group-focus-visible:ml-1.5 group-focus-visible:mr-2 group-focus-visible:max-w-[13rem] group-focus-visible:opacity-100">Made by Deepak Kumar, 1619.in</span>
+    </a>
+  </body>
+</html>

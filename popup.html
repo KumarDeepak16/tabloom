@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Save to Tabloom</title>
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/ui.css" />
+    <link rel="stylesheet" href="css/popup.css" />
+    <script src="src/theme.js"></script>
+    <script type="module" src="src/popup.js"></script>
+  </head>
+  <body>
+    <form id="form">
+      <header class="head">
+        <span class="tile-mini"><img id="fav" alt="" /></span>
+        <h1>Save to Tabloom</h1>
+      </header>
+      <label class="label">Name<input class="field" id="name" maxlength="60" autocomplete="off" /></label>
+      <div class="label">Save in
+        <div class="row" id="groups" role="group" aria-label="Save in"></div>
+      </div>
+      <p class="error" id="error" hidden></p>
+      <button class="btn green wide" id="save" type="submit">Save link</button>
+    </form>
+    <p class="blocked" id="blocked" hidden>This page can't be saved. Open a website and try again.</p>
+  </body>
+</html>

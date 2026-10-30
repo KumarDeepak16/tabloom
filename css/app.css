@@ -1,0 +1,1712 @@
+/* Tabloom new tab layout. */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  --side: 19.5rem;
+  --panel: 20rem;
+  --gap: 0.8rem;
+  display: grid;
+  grid-template-columns: var(--side) minmax(0, 1fr) var(--panel);
+  gap: var(--gap);
+  padding: var(--gap);
+  overflow: hidden;
+  background:
+    radial-gradient(60vw 60vh at 82% 112%, var(--glow-a), transparent 72%),
+    radial-gradient(50vw 55vh at 22% -12%, var(--glow-b), transparent 70%),
+    var(--bg);
+  transition: grid-template-columns 0.3s var(--glide);
+}
+
+:root[data-side='min'] body {
+  --side: 4.1rem;
+}
+
+/* Background image: oversized so blur never shows a soft edge. */
+#photo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#photo img {
+  position: absolute;
+  inset: -3rem;
+  width: calc(100% + 6rem);
+  height: calc(100% + 6rem);
+  object-fit: cover;
+  filter: blur(var(--photo-blur, 0));
+}
+
+#photo i {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: var(--photo-dim, 0.3);
+}
+
+/* Text sitting directly on a photo gets more weight and a soft halo. */
+#photo:not([hidden]) ~ .work .date,
+#photo:not([hidden]) ~ .work .clock {
+  color: var(--ink);
+  text-shadow: 0 0 0.8rem var(--bg);
+}
+
+/* Aurora: three slow color fields, moved only with transform. */
+#aurora {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+:root[data-motion='aurora'] #aurora {
+  display: block;
+}
+
+:root[data-motion='aurora'] #dots,
+:root[data-motion='still'] #dots {
+  display: none;
+}
+
+:root.bg-paused #aurora i {
+  animation-play-state: paused;
+}
+
+#aurora i {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  opacity: 0.55;
+  animation: drift 34s ease-in-out infinite alternate;
+}
+
+#aurora i:nth-child(1) {
+  top: -30vmax;
+  left: 5vw;
+  background: radial-gradient(closest-side, rgb(255 176 32 / 0.55), transparent);
+}
+
+#aurora i:nth-child(2) {
+  right: -25vmax;
+  bottom: -35vmax;
+  background: radial-gradient(closest-side, rgb(255 92 138 / 0.5), transparent);
+  animation-duration: 46s;
+  animation-direction: alternate-reverse;
+}
+
+#aurora i:nth-child(3) {
+  bottom: -40vmax;
+  left: 20vw;
+  background: radial-gradient(closest-side, rgb(214 107 214 / 0.38), transparent);
+  animation-duration: 58s;
+}
+
+@keyframes drift {
+  to {
+    transform: translate(18vw, 12vh) scale(1.2);
+  }
+}
+
+#dots {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s linear;
+}
+
+#dots.on {
+  opacity: 1;
+}
+
+.side,
+.work,
+.deck {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+.side,
+.today {
+  border-radius: var(--r-l);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 0.11rem var(--line), 0 0.28rem 0 var(--line);
+}
+
+/* Sidebar */
+.side {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.28rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem 0.15rem;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.brand a:first-child {
+  display: flex;
+  transition: transform 0.2s var(--spring);
+}
+
+.brand a:first-child:hover {
+  transform: rotate(-12deg) scale(1.12);
+}
+
+.brand img {
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.brand #portfolio {
+  margin-left: auto;
+}
+
+/* Rail: every link stays one click away, as icons only. */
+:root[data-side='min'] .brand {
+  flex-direction: column;
+  padding: 0.65rem 0 0.2rem;
+}
+
+:root[data-side='min'] .brand span,
+:root[data-side='min'] .brand #portfolio,
+:root[data-side='min'] .group-head,
+:root[data-side='min'] .marks-empty {
+  display: none;
+}
+
+:root[data-side='min'] #groups {
+  flex: none;
+}
+
+:root[data-side='min'] .group {
+  flex: none;
+  padding: 0.3rem 0.65rem;
+}
+
+:root[data-side='min'] .group:nth-child(3) {
+  margin-top: 0;
+}
+
+:root[data-side='min'] .tiles,
+:root[data-side='min'] .marks {
+  grid-template-columns: minmax(0, 1fr);
+  max-height: none;
+}
+
+:root[data-side='min'] .mark {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 28%;
+}
+
+:root[data-side='min'] .mark span {
+  display: none;
+}
+
+:root[data-side='min'] .mark img {
+  width: 58%;
+  height: 58%;
+}
+
+/* Bookmarks and Workspace hold the top; AI tools and the rest sit at the bottom on tall screens. */
+#groups {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.3rem;
+}
+
+.group {
+  padding: 0.15rem 0.9rem 0.38rem;
+}
+
+.group {
+  flex: none;
+}
+
+/* Bookmarks give way first on short screens: the list scrolls, every other section stays. */
+.group:first-child {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 4.5rem;
+}
+
+.group:nth-child(3) {
+  margin-top: auto;
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 1.6rem;
+}
+
+.group-head h2 {
+  margin: 0;
+  color: color-mix(in srgb, var(--hue) 78%, var(--ink));
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+/* Keep the add button quiet until the section is in use. */
+.group-head .btn {
+  width: 1.4rem;
+  min-height: 1.4rem;
+  opacity: 0.55;
+  transition: opacity 0.12s linear, transform 0.14s var(--spring), box-shadow 0.1s linear;
+}
+
+.group:hover .group-head .btn,
+.group-head .btn:focus-visible {
+  opacity: 1;
+}
+
+/* Eight rows, then its own scroll: a bulk import must not push the other sections away. */
+.marks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.26rem;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 14.3rem;
+  margin: 0;
+  padding: 0 0 0.14rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.mark {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--r-s);
+  background: color-mix(in srgb, var(--hue) 13%, var(--surface));
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.3;
+  text-decoration: none;
+  box-shadow: 0 0.12rem 0 color-mix(in srgb, var(--hue) 32%, var(--surface));
+  transition: transform 0.14s var(--spring), background-color 0.12s linear, box-shadow 0.1s linear;
+}
+
+.mark img {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.2rem;
+}
+
+.mark span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mark:hover {
+  background: color-mix(in srgb, var(--hue) 26%, var(--surface));
+  transform: translateY(-0.08rem);
+  box-shadow: 0 0.2rem 0 color-mix(in srgb, var(--hue) 55%, var(--surface));
+}
+
+.mark:active {
+  transform: translateY(0.12rem);
+  box-shadow: 0 0 0 transparent;
+}
+
+.marks-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.36rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Keycap: top light, soft body, hard lower edge. */
+.tile {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 28%;
+  background: linear-gradient(180deg, #fff 0%, #fff 55%, var(--tile) 100%), var(--tile);
+  box-shadow:
+    inset 0 0 0 0.07rem rgb(58 36 18 / 0.07),
+    0 0.2rem 0 var(--tile-edge),
+    0 0.3rem 0.45rem rgb(58 36 18 / 0.14);
+  transition: transform 0.14s var(--spring), box-shadow 0.1s linear;
+}
+
+.tile img {
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+  filter: drop-shadow(0 0.05rem 0.05rem rgb(58 36 18 / 0.2));
+}
+
+.tile:hover {
+  transform: translateY(-0.14rem) scale(1.05);
+  box-shadow:
+    inset 0 0 0 0.07rem rgb(58 36 18 / 0.07),
+    0 0.3rem 0 var(--tile-edge),
+    0 0.55rem 0.7rem rgb(58 36 18 / 0.18);
+}
+
+.tile:active {
+  transform: translateY(0.2rem);
+  box-shadow: inset 0 0 0 0.07rem rgb(58 36 18 / 0.07), 0 0 0 var(--tile-edge);
+}
+
+/* Main column */
+.work {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0 0.7rem;
+}
+
+.top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0.15rem 0;
+}
+
+.clock {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 4.7rem;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock span span {
+  display: inline-block;
+}
+
+.clock small {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: var(--orange-edge);
+}
+
+.time {
+  flex: 0 1 21rem;
+  min-width: 0;
+}
+
+.date {
+  margin: 0.4rem 0 0;
+  height: 1.4em;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dock {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.dock {
+  flex: none;
+  align-self: center;
+}
+
+/* Icon keys that open to say what they do. */
+.dock .btn {
+  gap: 0;
+  padding: 0 0.62rem;
+}
+
+.fold {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.28s var(--glide);
+}
+
+.fold b {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 800;
+  opacity: 0;
+  transition: opacity 0.18s linear;
+}
+
+.dock .btn:hover .fold,
+.dock .btn:focus-visible .fold,
+.dock .btn.is-open .fold {
+  grid-template-columns: 1fr;
+}
+
+.dock .btn:hover .fold b,
+.dock .btn:focus-visible .fold b,
+.dock .btn.is-open .fold b {
+  padding-left: 0.4rem;
+  opacity: 1;
+}
+
+/* The day as a path: the sun walks it, timed work sits on it. */
+.arc {
+  flex: 1;
+  min-width: 0;
+  height: 5.6rem;
+  overflow: visible;
+}
+
+.arc path {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.arc-base {
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-dasharray: 1 7;
+}
+
+.arc-done {
+  stroke: url(#arc-warm);
+  stroke-width: 3;
+}
+
+.arc-marks circle {
+  fill: var(--surface);
+  stroke: var(--pink);
+  stroke-width: 2.4;
+  cursor: help;
+  transition: transform 0.14s var(--spring);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.arc-marks circle:hover {
+  transform: scale(1.5);
+}
+
+.arc-marks circle.past {
+  stroke: var(--muted);
+}
+
+.arc-sun {
+  cursor: pointer;
+  transition: transform 1s var(--glide);
+}
+
+.arc-core {
+  fill: #ffc800;
+  stroke: #ff9600;
+  stroke-width: 2;
+}
+
+.arc-glow {
+  fill: #ffb020;
+  opacity: 0.28;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: breathe 5s ease-in-out infinite;
+}
+
+:root.bg-paused .arc-glow {
+  animation-play-state: paused;
+}
+
+.arc-sun.night .arc-core {
+  fill: #f1e7d6;
+  stroke: #b5a392;
+}
+
+.arc-sun.night .arc-glow {
+  fill: #b5a392;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.1;
+    transform: scale(1.35);
+  }
+}
+
+/* Sticky board */
+.board {
+  position: relative;
+  min-height: 0;
+}
+
+.board-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.note {
+  --n: var(--paper-yellow);
+  --ne: var(--paper-yellow-edge);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: 13.5rem;
+  height: 11.25rem;
+  padding: 0.85rem 0.95rem 0.6rem;
+  border-radius: 1.05rem;
+  background: var(--n);
+  color: var(--on-color);
+  cursor: grab;
+  touch-action: none;
+  box-shadow: 0 0.26rem 0 var(--ne), 0 0.7rem 1.3rem rgb(58 36 18 / 0.13);
+  transition: transform 0.42s var(--glide), box-shadow 0.16s linear;
+}
+
+.note:hover {
+  box-shadow: 0 0.34rem 0 var(--ne), 0 1rem 1.7rem rgb(58 36 18 / 0.18);
+}
+
+.note.lifted {
+  cursor: grabbing;
+  transition: box-shadow 0.16s linear;
+  box-shadow: 0 0.42rem 0 var(--ne), 0 1.7rem 2.6rem rgb(58 36 18 / 0.26);
+}
+
+.note-face {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 0.86rem;
+  line-height: 1.38;
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, #000 76%, transparent 100%);
+}
+
+.note-face.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.note-face.md h1 { font-size: 1.22em; }
+.note-face.md h2 { font-size: 1.14em; }
+.note-face.md h3 { font-size: 1.06em; }
+.note-face.md h1, .note-face.md h2, .note-face.md h3 { margin: 0 0 0.3em; }
+.note-face.md p, .note-face.md ul, .note-face.md ol { margin-bottom: 0.4em; }
+
+.note-face.blank {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  opacity: 0.5;
+  mask-image: none;
+}
+
+.note-date {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  opacity: 0.58;
+}
+
+.yellow-note { --n: var(--paper-yellow); --ne: var(--paper-yellow-edge); }
+.green-note { --n: var(--paper-green); --ne: var(--paper-green-edge); }
+.blue-note { --n: var(--paper-blue); --ne: var(--paper-blue-edge); }
+.pink-note { --n: var(--paper-pink); --ne: var(--paper-pink-edge); }
+.purple-note { --n: var(--paper-purple); --ne: var(--paper-purple-edge); }
+.orange-note { --n: var(--paper-orange); --ne: var(--paper-orange-edge); }
+
+/* Right column: Today sits on top of a deck, with earlier days tucked under it. */
+.deck {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.today {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.28rem;
+  transition: margin-bottom 0.3s var(--glide);
+  padding: 0.85rem 0.95rem 0.5rem;
+  overflow: hidden;
+}
+
+.today-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.today-head .streak {
+  margin-left: auto;
+}
+
+.today-head #toggle-today {
+  margin-left: 0;
+}
+
+.today-head .streak[hidden] + #toggle-today {
+  margin-left: auto;
+}
+
+.today-mini {
+  display: none;
+}
+
+.today-head h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  color: var(--orange-edge);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.streak svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.meter {
+  height: 0.8rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--sunken);
+}
+
+.meter i {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transform: translateX(-100%);
+  transition: transform 0.5s var(--spring);
+}
+
+/* Gloss strip along the bar */
+.meter i::after {
+  content: '';
+  position: absolute;
+  top: 0.16rem;
+  right: 0.4rem;
+  left: 0.4rem;
+  height: 0.18rem;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.42);
+}
+
+.count {
+  margin: -0.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.tasks {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  list-style: none;
+}
+
+.todo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.36rem 0.1rem;
+  border-radius: var(--r-s);
+}
+
+.task-body {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.93rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.task-body span {
+  background: linear-gradient(currentcolor, currentcolor) 0 55% / 0 0.1rem no-repeat;
+  transition: background-size 0.24s var(--glide), color 0.2s linear;
+}
+
+.todo.done .task-body span {
+  color: var(--muted);
+  background-size: 100% 0.1rem;
+}
+
+.task-meta {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.task-meta.at {
+  color: var(--blue-edge);
+}
+
+.task-meta.late {
+  color: var(--pink-edge);
+}
+
+.todo .btn {
+  opacity: 0;
+  transition: opacity 0.12s linear, transform 0.14s var(--spring), box-shadow 0.1s linear;
+}
+
+.todo:hover .btn,
+.todo .btn:focus-visible {
+  opacity: 1;
+}
+
+.tasks-empty {
+  flex: 1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.deck.has-earlier .today {
+  margin-bottom: 2.75rem;
+}
+
+.earlier {
+  --tab: 3.4rem;
+  position: absolute;
+  z-index: 0;
+  top: calc(100% - var(--tab));
+  right: 0.55rem;
+  left: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 0.6rem);
+  border-radius: var(--r-l) var(--r-l) 0 0;
+  background: var(--paper-orange);
+  color: var(--on-color);
+  box-shadow: inset 0 0 0 0.11rem var(--paper-orange-edge);
+  transition: transform 0.42s var(--glide), z-index 0s 0.42s;
+}
+
+.earlier.open {
+  z-index: 2;
+  border-radius: var(--r-l);
+  transform: translateY(calc(-100% + var(--tab)));
+  transition: transform 0.42s var(--glide), z-index 0s;
+}
+
+.earlier-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+  width: 100%;
+  height: var(--tab);
+  padding: 0.65rem 0.95rem 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  color: inherit;
+  font: 900 0.95rem/1 Nunito, 'Segoe UI', sans-serif;
+  cursor: pointer;
+}
+
+.earlier-tab span {
+  margin-left: auto;
+  font-size: 0.82rem;
+  font-weight: 800;
+  opacity: 0.72;
+}
+
+.earlier-tab svg {
+  flex: none;
+  transition: transform 0.3s var(--spring);
+}
+
+.earlier.open .earlier-tab {
+  padding-top: 0;
+}
+
+.earlier.open .earlier-tab svg {
+  transform: rotate(180deg);
+}
+
+.earlier-list {
+  flex: 1;
+  min-height: 0;
+  padding: 0 0.95rem 0.8rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--paper-orange-edge) transparent;
+}
+
+.earlier-list h3 {
+  margin: 0.5rem 0 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 900;
+  opacity: 0.68;
+}
+
+.tasks-flat {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.earlier .check {
+  border-color: var(--on-color);
+  opacity: 0.8;
+}
+
+.earlier .btn {
+  --c: #fff;
+  --e: var(--paper-orange-edge);
+  --fg: var(--on-color);
+}
+
+.earlier .todo.done .task-body span {
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* Bloom */
+.bloom {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin: 0 -0.3rem 0.1rem;
+  padding: 0.3rem 0.7rem 0.35rem 0.3rem;
+  border-radius: var(--r-m);
+  background: color-mix(in srgb, var(--orange) 11%, var(--surface));
+}
+
+.bloom-art {
+  flex: none;
+  width: 5.8rem;
+  height: 7.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.bloom-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+
+.bloom-plant {
+  transform-origin: 60px 122px;
+  animation: sway 6s ease-in-out 4;
+}
+
+.bloom-art:hover .bloom-plant {
+  animation-iteration-count: infinite;
+}
+
+#bloom-lids {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes sway {
+  25% {
+    transform: rotate(2.4deg);
+  }
+  75% {
+    transform: rotate(-2.4deg);
+  }
+}
+
+.bloom-info {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 0.35rem;
+}
+
+.bloom-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.bloom-title b {
+  color: var(--ink);
+  font-size: 1.02rem;
+  font-weight: 900;
+}
+
+.bloom-next {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.meter.is-thin {
+  height: 0.55rem;
+}
+
+.meter.is-thin i {
+  background: var(--orange);
+}
+
+.meter.is-thin i::after {
+  top: 0.1rem;
+  height: 0.12rem;
+}
+
+/* Full-page note */
+.editor {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: color-mix(in srgb, var(--n) 58%, #fff);
+  color: var(--on-color);
+}
+
+.editor-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(56rem, 100%);
+  margin: 0 auto;
+  padding: 0.9rem 1.25rem 0.5rem;
+}
+
+/* Editor controls sit on paper, so they keep light surfaces in dark theme too. */
+.editor .btn {
+  --c: #fff;
+  --e: var(--ne);
+  --fg: var(--on-color);
+}
+
+.editor .btn[aria-pressed='true'] {
+  --c: var(--on-color);
+  --e: var(--on-color);
+  --fg: #fff;
+}
+
+#ed-back {
+  margin-right: auto;
+}
+
+.swatches {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0 0.3rem;
+}
+
+.swatch {
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 0.14rem solid var(--ne);
+  border-radius: 50%;
+  background: var(--n);
+  cursor: pointer;
+  transition: transform 0.14s var(--spring);
+}
+
+.swatch:hover {
+  transform: scale(1.14);
+}
+
+.swatch[aria-pressed='true'] {
+  border-color: var(--on-color);
+}
+
+.editor-page {
+  width: min(56rem, 100%);
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0.4rem 1.25rem;
+}
+
+#ed-input,
+.editor-preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ne) transparent;
+  color: var(--on-color);
+  font: 600 1.12rem/1.65 Nunito, 'Segoe UI', sans-serif;
+}
+
+#ed-input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  resize: none;
+}
+
+#ed-input::placeholder {
+  color: var(--on-color);
+  opacity: 0.45;
+}
+
+.editor-foot {
+  width: min(56rem, 100%);
+  margin: 0 auto;
+  padding: 0.3rem 1.25rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  opacity: 0.6;
+}
+
+/* The sticky grows into the page. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(note) {
+  animation-duration: 0.38s;
+  animation-timing-function: var(--glide);
+}
+
+::view-transition-old(note),
+::view-transition-new(note) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  animation-duration: 0.22s;
+}
+
+/* The small sticky would blow up while growing, so it leaves first. */
+::view-transition-old(note) {
+  animation-duration: 0.09s;
+}
+
+/* Narrow windows: stack the Today panel under the board and let the page scroll. */
+@media (max-width: 62rem) {
+  body {
+    grid-template-columns: var(--side) minmax(0, 1fr);
+    grid-template-rows: 100vh auto;
+    height: auto;
+    overflow: auto;
+  }
+
+  .deck {
+    grid-column: 2;
+    min-height: 30rem;
+  }
+}
+
+/* Today rail: progress, streak and Bloom stay in view; the list folds away. */
+:root[data-today='min'] body {
+  --panel: 4.1rem;
+}
+
+:root[data-today='min'] .today {
+  align-items: center;
+  margin-bottom: 0.28rem;
+  padding: 0.65rem 0.35rem 0.4rem;
+}
+
+:root[data-today='min'] .today > :not(.today-head, .bloom, .rail-ticker),
+:root[data-today='min'] .earlier,
+:root[data-today='min'] .today-head h2,
+:root[data-today='min'] .bloom-info {
+  display: none;
+}
+
+:root[data-today='min'] .today-head {
+  flex-direction: column;
+}
+
+:root[data-today='min'] .today-head .streak,
+:root[data-today='min'] .today-head #toggle-today {
+  order: 1;
+  margin-left: 0;
+}
+
+:root[data-today='min'] .today-head #toggle-today {
+  order: 0;
+}
+
+:root[data-today='min'] .today-mini {
+  display: block;
+  order: 2;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+:root[data-today='min'] .bloom {
+  margin: auto 0 0;
+  padding: 0;
+  background: none;
+}
+
+:root[data-today='min'] .bloom-art {
+  width: 3.2rem;
+  height: 4rem;
+}
+
+/* With the calendar on, notes live inside their dates. */
+:root[data-cal='on'] .note,
+:root[data-cal='on'] #tidy {
+  display: none;
+}
+
+/* Work calendar: a calm 3:2 sheet, centered on the board. */
+.calendar {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0.3rem;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 3 / 2;
+  max-width: 100%;
+  padding: 0.75rem 0.9rem 0.6rem;
+  border-radius: var(--r-l);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 0.11rem var(--line), 0 0.28rem 0 var(--line);
+  translate: -50% 0;
+  animation: cal-in 0.34s var(--spring);
+}
+
+@keyframes cal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.cal-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0 0.2rem 0.45rem;
+}
+
+.cal-head h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.cal-head small {
+  color: var(--muted);
+  font-size: 0.72em;
+  font-weight: 800;
+}
+
+.cal-head .row {
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+}
+
+.cal-forward svg {
+  transform: scaleX(-1);
+}
+
+.cal-names {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  padding: 0 0.1rem 0.15rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.cal-names span {
+  padding-left: 0.55rem;
+}
+
+.cal-weeks {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cal-week {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+/* No lines: each date is a soft key that lights up when you reach for it. */
+.cal-day {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  border: 0.1rem solid transparent;
+  border-radius: 0.8rem;
+  background: none;
+  background-clip: padding-box;
+  color: var(--ink);
+  font: 800 0.82rem/1 Nunito, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.1s linear;
+}
+
+.cal-day span {
+  position: absolute;
+  top: 0.22rem;
+  left: 0.3rem;
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+}
+
+.cal-day small {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.2rem;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+.cal-day:hover {
+  background-color: var(--sunken);
+}
+
+.cal-day.weekend span,
+.cal-day.past span {
+  color: var(--muted);
+}
+
+.cal-day.outside span {
+  color: var(--muted);
+  opacity: 0.4;
+}
+
+.cal-day.is-today span {
+  background: var(--orange);
+  color: var(--on-color);
+  font-weight: 900;
+  opacity: 1;
+  box-shadow: 0 0.12rem 0 var(--orange-edge);
+}
+
+.cal-day.picking {
+  background-color: color-mix(in srgb, var(--orange) 24%, transparent);
+}
+
+/* A little fan of paper: one sheet per note on that date. */
+.cal-papers {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.42rem;
+  display: flex;
+  align-items: center;
+}
+
+.cal-papers i {
+  width: 0.72rem;
+  height: 0.72rem;
+  margin-left: -0.3rem;
+  border-radius: 0.17rem;
+  background: var(--n);
+  box-shadow: 0 0.09rem 0 var(--ne), 0 0 0 0.07rem var(--surface);
+  transform: rotate(-7deg);
+}
+
+.cal-papers i:nth-child(2) {
+  transform: rotate(5deg) translateY(0.06rem);
+}
+
+.cal-papers b {
+  margin-left: 0.22rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+/* A date opened up: everything on that day, ready to open. */
+.day {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem 0.8rem;
+  border-radius: inherit;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 0.11rem var(--line);
+}
+
+.day-head {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.day-head h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.day-head p {
+  margin: 0.1rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.day-head .row {
+  flex: none;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+}
+
+.day-works {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.day-notes {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  grid-auto-rows: 10rem;
+  align-content: start;
+  gap: 0.75rem;
+  padding: 0.15rem 0.2rem 0.45rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.day-card {
+  display: flex;
+  min-width: 0;
+  padding: 0.8rem 0.9rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--n);
+  color: var(--on-color);
+  font: 600 1rem/1.4 Nunito, 'Segoe UI', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 0.24rem 0 var(--ne);
+  transition: transform 0.14s var(--spring), box-shadow 0.1s linear;
+}
+
+.day-card:hover {
+  transform: translateY(-0.16rem) rotate(-0.6deg);
+  box-shadow: 0 0.38rem 0 var(--ne);
+}
+
+.day-card:active {
+  transform: translateY(0.2rem);
+  box-shadow: 0 0 0 var(--ne);
+}
+
+.day-card.entering {
+  animation: card-in 0.3s var(--spring) backwards;
+  animation-delay: calc(0.12s + var(--i) * 0.04s);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.7rem) scale(0.94);
+  }
+}
+
+::view-transition-group(day) {
+  animation-duration: 0.4s;
+  animation-timing-function: var(--glide);
+}
+
+::view-transition-old(day),
+::view-transition-new(day) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  animation-duration: 0.22s;
+}
+
+::view-transition-old(day) {
+  animation-duration: 0.1s;
+}
+
+/* Bars sit over the day cells; only the bars themselves take clicks. */
+.cal-bars {
+  position: absolute;
+  inset: 1.6rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 1.03rem;
+  gap: 0.14rem 0;
+  pointer-events: none;
+}
+
+.cal-bar {
+  min-width: 0;
+  margin: 0;
+  padding: 0 0.3rem;
+  overflow: hidden;
+  border: 0;
+  background: var(--n);
+  color: var(--on-color);
+  font: 800 0.7rem/1.03rem Nunito, 'Segoe UI', sans-serif;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: inset 0 -0.14rem 0 var(--ne);
+  transition: filter 0.1s linear;
+}
+
+.cal-bar.opens {
+  margin-left: 0.2rem;
+  border-top-left-radius: 0.4rem;
+  border-bottom-left-radius: 0.4rem;
+}
+
+.cal-bar.closes {
+  margin-right: 0.2rem;
+  border-top-right-radius: 0.4rem;
+  border-bottom-right-radius: 0.4rem;
+}
+
+.cal-bar:hover {
+  filter: brightness(1.05) saturate(1.2);
+}
+
+/* Current work: what runs now and how long it has left. */
+.cal-foot {
+  display: flex;
+  flex: none;
+  gap: 0.35rem;
+  align-items: center;
+  height: 2.75rem;
+  padding-top: 0.45rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cal-foot p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.cal-chip {
+  display: grid;
+  flex: none;
+  max-width: 13rem;
+  padding: 0.16rem 0.6rem 0.24rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: var(--n);
+  color: var(--on-color);
+  font: 700 0.68rem/1.2 Nunito, 'Segoe UI', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 0.14rem 0 var(--ne);
+  transition: transform 0.14s var(--spring);
+}
+
+.cal-chip:hover {
+  transform: translateY(-0.08rem);
+}
+
+.cal-chip:active {
+  transform: translateY(0.12rem);
+}
+
+.cal-chip b {
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Coming up: separate from the to-do list, only there when it has something. */
+.agenda {
+  display: grid;
+  flex: none;
+  gap: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 0.09rem solid var(--line);
+}
+
+.agenda-group {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.agenda-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 1.75rem;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.agenda-row span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-row b {
+  flex: none;
+  color: var(--orange-edge);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.agenda-row.live b {
+  color: var(--green-edge);
+}
+
+.agenda-row img {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+a.agenda-row:hover span {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* Collapsed panel: pending tasks pass by, one at a time, reading upward. */
+.rail-ticker {
+  display: none;
+}
+
+:root[data-today='min'] .rail-ticker {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+  padding: 0.4rem 0;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.rail-ticker span {
+  display: block;
+  max-height: 100%;
+  overflow: hidden;
+  font: 800 0.92rem/1.3 Nunito, 'Segoe UI', sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+}
